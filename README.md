@@ -57,11 +57,8 @@ To provide flexibility for the user or developer, Qlingo allows them to choose w
     Overall, Qlingo offers a powerful solution for designers and developers looking to turn their Figma designs into PyQt5 applications quickly and easily, without sacrificing style or functionality.
 </p>
 
+
 # Getting Started!
-
----
-
-
 ### Understanding the qlingo command tool.
 
 To generate a pyqt5 designed app from figma is made easy by using the qlingo terminal command that helps you manage your project and generate apps from design.
