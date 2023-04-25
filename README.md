@@ -57,10 +57,12 @@ To provide flexibility for the user or developer, Qlingo allows them to choose w
     Overall, Qlingo offers a powerful solution for designers and developers looking to turn their Figma designs into PyQt5 applications quickly and easily, without sacrificing style or functionality.
 </p>
 
-
-## Using qlingo module
+# Getting Started!
 
 ---
+
+
+### Understanding the qlingo command tool.
 
 To generate a pyqt5 designed app from figma is made easy by using the qlingo terminal command that helps you manage your project and generate apps from design.
 
@@ -70,7 +72,7 @@ To generate a pyqt5 designed app from figma is made easy by using the qlingo ter
 pip install qlingo-cmd
 ```
 
-### Generating a package 📦
+### Generating a package from url 📦
 
 ```shell
 qlingo -generate {FILETOKEN} {FILEURL}
@@ -80,3 +82,22 @@ This will generate an app package that contains your styles, A main runnable pyt
 
 #### Understanding the project structure!
 A project will be generated based on the title of your figma file in your current directory, after locating the directory you should see the generated pages based on their content with a simple project thumbnail png image showing the looks of the ui created from figma. inside the pages you should see a ``src`` folder with all the usable assets and files.
+
+# Supported Widgets.
+Qlingo makes it easy to convert widgets from Figma designs to PyQt5 code using the QQU language. With Qlingo, you can automatically generate the PyQt5 code. This means you can quickly and easily create fully functional PyQt5 apps from your Figma designs, without having to manually write or layout the code yourself. QQU provides a simplified syntax for creating PyQt5 widgets, making it more intuitive and easier to read than raw PyQt5 code. By using Qlingo, you can save time and effort in the development process, and create polished, professional-looking apps that match your Figma designs.
+
+#### But wait, Differences!.
+This simply means we will have to do alot of conversion and naming since thay all have different names that they call their widgets expecially figma which does'nt support the adding of widget!.
+
+Here! is a simple overview of some supported widgets and how to use them respectively in each of the frameworks.
+
+| PyQt5       | Figma      | QQu       |
+|:------------|:-----------|:----------|
+| QMainWindow | Main Frame | Window    |
+| QFrame      | Frame      | Frame     |
+| QPushButton | Button     | Button    |
+| QTextEdit   | TextEdit   | TextEdit  |
+| QLineEdit   | TextInput  | TextInput |
+| QFrame      | Text       | Text      |
+| QLabel      | Image      | Image     |
+| QLabel      | Label      | Label     |
