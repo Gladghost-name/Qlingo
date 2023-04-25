@@ -48,7 +48,7 @@ class MainApp(App):
 
 To provide flexibility for the user or developer, Qlingo allows them to choose whether to reload the app automatically with changes or run it once without reload, by using either ``self.reloadable(True)`` in the app class or simply calling ``self.load_app()`` as needed.
 
-# figma to app.
+# _Figma to app_.
 
 <p align="right">
   <img align="left" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Figma-logo.svg/200px-Figma-logo.png" alt="figma logo">
