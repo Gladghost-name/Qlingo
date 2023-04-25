@@ -24,7 +24,7 @@ from qlingo.app import *
 
 QQU is a simple language for defining GUI layouts in Qlingo. Here's an example QQU file:
 
-```toml
+```bash
 Window:
     title: "My App"
     width: 400
@@ -84,9 +84,14 @@ This will generate an app package that contains your styles, A main runnable pyt
 A project will be generated based on the title of your figma file in your current directory, after locating the directory you should see the generated pages based on their content with a simple project thumbnail png image showing the looks of the ui created from figma. inside the pages you should see a ``src`` folder with all the usable assets and files.
 
 # Supported Widgets.
+
+---
+
 Qlingo makes it easy to convert widgets from Figma designs to PyQt5 code using the QQU language. With Qlingo, you can automatically generate the PyQt5 code. This means you can quickly and easily create fully functional PyQt5 apps from your Figma designs, without having to manually write or layout the code yourself. QQU provides a simplified syntax for creating PyQt5 widgets, making it more intuitive and easier to read than raw PyQt5 code. By using Qlingo, you can save time and effort in the development process, and create polished, professional-looking apps that match your Figma designs.
 
-#### But wait, Differences!.
+#### But wait, Differences⚠️.
+
+---
 This simply means we will have to do alot of conversion and naming since thay all have different names that they call their widgets expecially figma which does'nt support the adding of widget!.
 
 Here! is a simple overview of some supported widgets and how to use them respectively in each of the frameworks.
@@ -101,3 +106,5 @@ Here! is a simple overview of some supported widgets and how to use them respect
 | QFrame      | Text       | Text      |
 | QLabel      | Image      | Image     |
 | QLabel      | Label      | Label     |
+
+##### _Note: This is a simple overview of some inplementations of widgets using the qqu file and the figms file, for more info pls view the ``docs.md`` file in the project directories!_
