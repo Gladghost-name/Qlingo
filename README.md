@@ -1,12 +1,17 @@
-# Qlingo: A PyQt5 Module for Faster Development and App Creation
+[//]: # (# Qlingo-AppCreator)
 
----
+[//]: # ()
+[//]: # (---)
+
+<p align="center">
+    <img align="top" src="https://variwiki.com/images/4/4e/Qt_logo.png" alt="figma logo">
+    <h1 align="center">Qlingo-AppCreator</h1>
+</p>
 
 Qlingo is a Python module that leverages the PyQt5 library for faster development and app creation. It includes a custom language called QQU (Qlingo Quick UI) for defining GUI layouts, and supports automatic reloading of changes during development.
 
 
 ## Getting Started
-
 
 To use Qlingo, first make sure you have PyQt5 installed. You can install it using pip:
 
