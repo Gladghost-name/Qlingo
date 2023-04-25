@@ -56,7 +56,7 @@ To provide flexibility for the user or developer, Qlingo allows them to choose w
 # _Figma to app_.
 
 <p align="right">
-  <img align="left" width="200" height="200" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Figma-logo.svg/200px-Figma-logo.png" alt="figma logo">
+  <img align="left" width="200" height="400" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Figma-logo.svg/200px-Figma-logo.png" alt="figma logo">
     Qlingo offers a convenient way for users to convert their Figma designs into PyQt5 applications with stylish and modern UI. By using QQU, Qlingo's custom language for defining GUI layouts, users can quickly and easily translate their Figma designs into code. With the automatic reloading feature, users can make changes to their layout files and see them reflected immediately in their application.
     Additionally, Qlingo offers a wide range of pre-built styles that can be easily applied to the application's widgets, including buttons, labels, and input fields. These styles are designed to be visually appealing and fit well with modern design trends. By leveraging Qlingo's features and pre-built styles, users can create polished and professional-looking applications in a fraction of the time it would take to write the code manually.
     Overall, Qlingo offers a powerful solution for designers and developers looking to turn their Figma designs into PyQt5 applications quickly and easily, without sacrificing style or functionality.
