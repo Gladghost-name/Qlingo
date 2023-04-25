@@ -103,4 +103,4 @@ Here! is a simple overview of some supported widgets and how to use them respect
 | QLabel      | Image      | Image     |
 | QLabel      | Label      | Label     |
 
-Note: this is a simple overview of the bindings for some widgets, for more info pls read the ``docs.md`` file in project directory.
+Note: this is a simple overview and implementation of the bindings for some widgets, for more info pls read the ``docs.md`` file in project directory.
