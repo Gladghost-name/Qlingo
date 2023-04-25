@@ -48,7 +48,7 @@ class MainApp(App):
 
 To provide flexibility for the user or developer, Qlingo allows them to choose whether to reload the app automatically with changes or run it once without reload, by using either ``self.reloadable(True)`` in the app class or simply calling ``self.load_app()`` as needed.
 
-# Converting my design from figma to app.
+# figma to app.
 
 <p align="right">
   <img align="left" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Figma-logo.svg/200px-Figma-logo.png" alt="figma logo">
@@ -56,3 +56,27 @@ To provide flexibility for the user or developer, Qlingo allows them to choose w
     Additionally, Qlingo offers a wide range of pre-built styles that can be easily applied to the application's widgets, including buttons, labels, and input fields. These styles are designed to be visually appealing and fit well with modern design trends. By leveraging Qlingo's features and pre-built styles, users can create polished and professional-looking applications in a fraction of the time it would take to write the code manually.
     Overall, Qlingo offers a powerful solution for designers and developers looking to turn their Figma designs into PyQt5 applications quickly and easily, without sacrificing style or functionality.
 </p>
+
+
+## Using qlingo module
+
+---
+
+To generate a pyqt5 designed app from figma is made easy by using the qlingo terminal command that helps you manage your project and generate apps from design.
+
+### Importing using pip.
+
+```bash
+pip install qlingo-cmd
+```
+
+### Generating a package 📦
+
+```shell
+qlingo -generate {FILETOKEN} {FILEURL}
+```
+
+This will generate an app package that contains your styles, A main runnable python script and a qqu script for reloading the application based on your ``figma design``, just remember to replace the ``{FILETTOKEN}`` and ``{FILEURL}`` with your token and your file-key or file-url respectively.
+
+#### Understanding the project structure!
+A project will be generated based on the title of your figma file in your current directory, after locating the directory you should see the generated pages based on their content with a simple project thumbnail png image showing the looks of the ui created from figma. inside the pages you should see a ``src`` folder with all the usable assets and files.
