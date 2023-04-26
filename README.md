@@ -10,11 +10,11 @@
     </h1>
 </p>
 
-##### Qlingo is a Python module that leverages the PyQt5 library for faster development and app creation. It includes a custom language called QQU (Qlingo Quick UI) for defining GUI layouts, and supports automatic reloading of changes during development.
+Qlingo is a Python module that leverages the PyQt5 library for faster development and app creation. It includes a custom language called QQU (Qlingo Quick UI) for defining GUI layouts, and supports automatic reloading of changes during development.
 
-##### This is a powerful tool that allows users to easily convert Figma designs into functional applications. With QQU, users can leverage the power of Python and PyQt5 to create robust applications with ease.
+This is a powerful tool that allows users to easily convert Figma designs into functional applications. With QQU, users can leverage the power of Python and PyQt5 to create robust applications with ease.
 
-##### One of the key features of Qlingo is its ability to convert Figma designs into functional applications. Users can simply import their Figma designs into QQU and the module will automatically generate the code needed to create a functional application. This makes it simple for users to turn their designs into fully-functional applications with minimal effort.
+One of the key features of Qlingo is its ability to convert Figma designs into functional applications. Users can simply import their Figma designs into QQU and the module will automatically generate the code needed to create a functional application. This makes it simple for users to turn their designs into fully-functional applications with minimal effort.
 
 ## 💡**Introduction**
 
@@ -30,7 +30,7 @@ Next, download the Qlingo module and import it into your Python project:
 from qlingo.app import *
 ```
 
-# Using the qqu language!
+# Building with QQu 🔨
 
 QQU is a simple language for defining GUI layouts in Qlingo. Here's an example QQU file:
 
@@ -67,10 +67,10 @@ To provide flexibility for the user or developer, Qlingo allows them to choose w
     Overall, Qlingo offers a powerful solution for designers and developers looking to turn their Figma designs into PyQt5 applications quickly and easily, without sacrificing style or functionality.
 </p>
 
-# Getting Started
+# ⭐Getting Started
 
 
-### Understanding the qlingo command tool.
+##### Understanding the qlingo command tool.
 
 To generate a pyqt5 designed app from figma is made easy by using the qlingo terminal command that helps you manage your project and generate apps from design.
 
