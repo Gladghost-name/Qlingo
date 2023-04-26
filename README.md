@@ -112,7 +112,7 @@ Here! is a simple overview of some supported widgets and how to use them respect
 | QLabel      | Image      | Image     |
 | QLabel      | Label      | Label     |
 
-##### _Note: This is a simple overview of some inplementations of widgets using the qqu file and the figms file, for more info pls view the ``docs.md`` file in the project directories!_
+##### _Note: This is a simple overview of some inplementations of widgets using the qqu file and the figms file, for more info pls view or click the [usage.md](docs/usage.md) file in the documentation folder!_
 
 # __Requirements__
 Here are some requirements to using Qlingo!
