@@ -5,7 +5,10 @@
 
 <p align="center">
     <img align="top" src="https://variwiki.com/images/4/4e/Qt_logo.png" alt="figma logo">
-    <h1 align="center">Qlingo-AppCreator</h1>
+    <h1 align="center">Qlingo
+
+</h1>
+    <p align="center">Create, Design and Convert.</p>
 </p>
 
 Qlingo is a Python module that leverages the PyQt5 library for faster development and app creation. It includes a custom language called QQU (Qlingo Quick UI) for defining GUI layouts, and supports automatic reloading of changes during development.
@@ -111,9 +114,6 @@ Here! is a simple overview of some supported widgets and how to use them respect
 ##### _Note: This is a simple overview of some inplementations of widgets using the qqu file and the figms file, for more info pls view the ``docs.md`` file in the project directories!_
 
 # __Requirements__
-
----
-
 Here are some requirements to using Qlingo!
 
 - Any Desktop Computer (e.g, Windows, Linux mac, e.t.c..)
