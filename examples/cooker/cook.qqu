@@ -1,0 +1,11 @@
+Window:
+    title: "Python 3.11"
+    // Creating a BoxLayout
+    BoxLayout:
+        background_color: "white"
+        width: 850
+        height: 600
+        Frame:
+            Label:
+                text_align: "center"
+                text: "A Simple Cooking Application!."
