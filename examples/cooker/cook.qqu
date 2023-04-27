@@ -2,7 +2,7 @@ Window:
     title: "Python 3.11"
     // Creating a BoxLayout
     BoxLayout:
-        background_color: "white"
+        background_color: "grey"
         width: 850
         height: 600
         Frame:
