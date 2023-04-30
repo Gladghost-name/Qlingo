@@ -13,10 +13,8 @@ class Parse():
         for con in self.reader:
             self.line_index += 1
             if self.is_class(con):
-                # new_con = self.reader.index(con)
                 if "Window" not in con:
                     self.new_con.append(con.replace(':', str(self.line_index) + ':'))
-                    # print(con.replace(':', str(self.line_index) + ':'))
                 else:
                     self.new_con.append(con)
             else:
@@ -76,8 +74,6 @@ class Parse():
 
                         # run a complex system.
                         if tabno == alt_tab:
-                            # print(self.children)
-                            # print(self.children)
                             self.children.append(child.strip())
                         else:
                             # fix some issues concerning the parent.

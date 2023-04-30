@@ -51,12 +51,7 @@ class Window(QMainWindow):
         self.runner = Runner()
         self.content = []
 
-        # self.file_content = open(self.file, 'r+').read()
         self.new_frame = AppFrame()
-        # self.new_frame.setObjectName('body')
-        # self.new_frame_layout = QVBoxLayout()
-        # self.new_frame_layout.setContentsMargins(0, 0, 0, 0)
-        # self.new_frame.setLayout(self.new_frame_layout)
         self.setCentralWidget(self.new_frame)
 
         self.standby_timer = QTimer(self)
@@ -91,7 +86,6 @@ class Window(QMainWindow):
         for item in self.runner.master_children:
             if type(item) == dict:
                 propHandler.inherit_prop(self, item)
-        # print(self.master_window.styleSheet())
 
     def load(self):
         modified = os.path.getmtime(self.file)
