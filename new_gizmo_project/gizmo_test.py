@@ -37,12 +37,14 @@ class Ellipse(QGraphicsEllipseItem):
 
 
 class RectGizmo(QFrame):
-    def __init__(self, gizmos_list):
+    def __init__(self, gizmos_list, items):
         super().__init__()
         self.setStyleSheet("""background-color: transparent;""")
         self.item = None
-        # self.setBaseSize()
-        # self.grabMouse()
+        self.all_items = items
+
+        self.object_move_speed = 10
+
         self.proportional = False
 
         self.dragging = 'None'
@@ -267,6 +269,7 @@ class RectGizmo(QFrame):
             self.update()
 
     def mousePressEvent(self, a0):
+        self.all_items = []
         self.pos_x = a0.x()
         self.pos_y = a0.y()
         # self.cur_x = self.pos_x
@@ -283,7 +286,7 @@ class RectGizmo(QFrame):
         self.item.setOpacity(1)
         self.setFixedSize(int(self.item.rect().size().width() + 15), int(self.item.rect().size().height() + 15))
         self.hide()
-        self.new_frame = RectGizmo(self.list)
+        self.new_frame = RectGizmo(self.list, self.all_items)
         self.gizmos.append(self.new_frame)
         self.new_frame.setItem(self.item)
         self.item.scene().addWidget(self.new_frame)
@@ -296,18 +299,19 @@ class RectGizmo(QFrame):
         self.deleteLater()
 
     def close_all(self):
-        for widget in self.gizmos:
+        # self.all_items = []
+        for widget in self.list:
             widget.deleteLater()
 
-    def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
+    def handle_movement(self, a0):
         if a0.key() == Qt.Key_Right:
             self.rec = QRectF(self.item.rect())
-            self.new_rect = self.rec.translated(2, 0)
+            self.new_rect = self.rec.translated(self.object_move_speed, 0)
             self.item.setRect(self.new_rect)
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list)
+            self.new_frame = RectGizmo(self.list, self.all_items)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -322,12 +326,12 @@ class RectGizmo(QFrame):
             self.deleteLater()
         elif a0.key() == Qt.Key_Left:
             self.rec = QRectF(self.item.rect())
-            self.new_rect = self.rec.translated(-2, 0)
+            self.new_rect = self.rec.translated(-self.object_move_speed, 0)
             self.item.setRect(self.new_rect)
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list)
+            self.new_frame = RectGizmo(self.list, self.all_items)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -342,12 +346,12 @@ class RectGizmo(QFrame):
             self.deleteLater()
         elif a0.key() == Qt.Key_Down:
             self.rec = QRectF(self.item.rect())
-            self.new_rect = self.rec.translated(0, 2)
+            self.new_rect = self.rec.translated(0, self.object_move_speed)
             self.item.setRect(self.new_rect)
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list)
+            self.new_frame = RectGizmo(self.list, self.all_items)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -362,12 +366,12 @@ class RectGizmo(QFrame):
             self.deleteLater()
         elif a0.key() == Qt.Key_Up:
             self.rec = QRectF(self.item.rect())
-            self.new_rect = self.rec.translated(0, -2)
+            self.new_rect = self.rec.translated(0, -self.object_move_speed)
             self.item.setRect(self.new_rect)
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list)
+            self.new_frame = RectGizmo(self.list, self.all_items)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -382,6 +386,60 @@ class RectGizmo(QFrame):
             self.deleteLater()
         elif a0.key() == Qt.Key_Shift:
             self.proportional = True
+    def moveBy(self, item, x, y):
+        self.rec = QRectF(item.rect())
+        self.new_rect = self.rec.translated(x, y)
+        item.setRect(self.new_rect)
+
+        self.rec = QRectF(self.item.rect())
+        self.new_rect = self.rec.translated(x, y)
+        self.item.setRect(self.new_rect)
+
+        item.update()
+        self.item.update()
+        self.update()
+
+        if self in self.list:
+            self.list.remove(self)
+
+        for gizmo in self.list:
+            gizmo.hide()
+
+        self.new_frame = RectGizmo(self.list, self.all_items)
+        self.list.append(self.new_frame)
+        self.new_frame.setItem(item)
+        item.scene().addWidget(self.new_frame)
+
+        self.new_frame = RectGizmo(self.list, self.all_items)
+        self.list.append(self.new_frame)
+        self.new_frame.setItem(self.item)
+        self.item.scene().addWidget(self.new_frame)
+
+        item.update()
+        self.item.scene().update()
+        self.item.update()
+
+        self.deleteLater()
+    def handle_multi_movement(self, a0, item):
+        if a0.key() == Qt.Key_Right:
+            self.moveBy(item, self.object_move_speed, 0)
+        elif a0.key() == Qt.Key_Left:
+            self.moveBy(item, -self.object_move_speed, 0)
+        elif a0.key() == Qt.Key_Down:
+            self.moveBy(item, 0, self.object_move_speed)
+        elif a0.key() == Qt.Key_Up:
+            self.moveBy(item, 0, -self.object_move_speed)
+        elif a0.key() == Qt.Key_Shift:
+            self.proportional = True
+    def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
+        # print(self.all_items)
+        if len(self.all_items) > 1:
+            for item in self.all_items:
+                # self.list = []
+                if item != self.item:
+                    self.handle_multi_movement(a0, item)
+        else:
+            self.handle_movement(a0)
 
 
 class GraphicsView(QGraphicsView):
@@ -400,6 +458,7 @@ class GraphicsView(QGraphicsView):
 
         self.board = QGraphicsRectItem()
         self.board.setRect(20, 20, 700, 500)
+        # self.board.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         self.scene().addItem(self.board)
 
         self.board.setPen(QPen(QColor('black'), .3))
@@ -418,13 +477,19 @@ class GraphicsView(QGraphicsView):
         self.demo_rect2.setBrush(QColor('#d9d9d9'))
         self.demo_rect2.setRect(50, 50, 100, 100)
 
+        self.demo_rect3 = Rectangle()
+        self.demo_rect3.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
+        self.demo_rect3.setPen(QPen(QColor('black'), .5))
+        self.demo_rect3.setBrush(QColor('#d9d9d9'))
+        self.demo_rect3.setRect(50, 50, 100, 100)
+
         self.scene().addItem(self.demo_rect)
         self.scene().addItem(self.demo_rect2)
+        self.scene().addItem(self.demo_rect3)
 
     def object_selected(self):
         # print('yes')
         for item in self.gizmos:
-            # if item in self.scene().items():
             item.close_all()
             item.deleteLater()
         # self.gizmos.remove()
@@ -433,11 +498,11 @@ class GraphicsView(QGraphicsView):
         if self.scene().selectedItems() != []:
             for item in self.scene().selectedItems():
                 if item not in self.selected_item:
-                    self.gizmo = RectGizmo(self.gizmos)
+                    self.selected_item.append(item)
+                    self.gizmo = RectGizmo(self.gizmos, self.selected_item)
                     self.gizmo.setItem(item)
                     self.scene().addWidget(self.gizmo)
                     self.gizmos.append(self.gizmo)
-                    self.selected_item.append(item)
         self.update()
         self.scene().update()
 
@@ -452,11 +517,11 @@ class MyApp(QApplication):
         self.body_layout = QVBoxLayout()
         self.body.setLayout(self.body_layout)
 
-        self.change_color = QPushButton("Change item color!")
+        self.change_color = QPushButton("Change item(s) color!")
         self.change_color.clicked.connect(self.change_item_color)
         self.body_layout.addWidget(self.change_color)
 
-        self.change_pen = QPushButton("Change item pen color!")
+        self.change_pen = QPushButton("Change item(s) pen color!")
         self.change_pen.clicked.connect(self.change_item_pen_color)
         self.body_layout.addWidget(self.change_pen)
 
@@ -484,7 +549,6 @@ class MyApp(QApplication):
         if self.scene.selectedItems() != []:
             for item in self.scene.selectedItems():
                 item.setBrush(QColor(self.color_diag.selectedColor().name()))
-            # print(self.color_diag.selectedColor().name())
 
     def pen_color(self):
         if self.scene.selectedItems() != []:
