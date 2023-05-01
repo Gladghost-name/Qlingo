@@ -12,6 +12,8 @@ from PyQt5.Qt import *
 class Rectangle(QGraphicsRectItem):
     def __init__(self):
         super().__init__()
+        self.inherited_widget = None
+        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
 
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
@@ -27,7 +29,7 @@ class Rectangle(QGraphicsRectItem):
 class Ellipse(QGraphicsEllipseItem):
     def __init__(self):
         super().__init__()
-
+        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
         # Remove default paint from selection
@@ -40,11 +42,13 @@ class Ellipse(QGraphicsEllipseItem):
 
 
 class RectGizmo(QFrame):
-    def __init__(self, gizmos_list, items):
+    def __init__(self, gizmos_list, items, paste_objects):
         super().__init__()
         self.setStyleSheet("""background-color: transparent;""")
         self.item = None
         self.all_items = items
+
+        self.objects_to_paste = paste_objects
 
         self.object_move_speed = 10
 
@@ -64,9 +68,32 @@ class RectGizmo(QFrame):
         self.gizmos = []
         self.grabKeyboard()
 
-        self.node_size = 13
+        self.node_size = 9
         self.node_offset = 2
+        self.dup_annual_x = 0
+        self.dup_annual_y = 0
 
+        self.shortcut_dup = QShortcut(QKeySequence('ctrl+D'), self)
+        self.shortcut_dup.activated.connect(self.duplicate_item)
+
+        self.shortcut_copy = QShortcut(QKeySequence('ctrl+C'), self)
+        self.shortcut_copy.activated.connect(self.copy_item)
+    def copy_item(self):
+        self.objects_to_paste.append([type(self.item), self.item])
+    def duplicate_item(self):
+        if self.item.inherited_widget is not None:
+            self.dup_annual_x += self.item.rect().x()-self.item.inherited_widget.rect().x()
+            self.dup_annual_y += self.item.rect().y() - self.item.inherited_widget.rect().y()
+        self.new_item = type(self.item)()
+        self.new_item.inherited_widget = self.item
+        self.new_item.setBrush(self.item.brush())
+        self.new_item.setPen(self.item.pen())
+        self.new_item.setRect(QRectF(self.item.rect().x()+self.dup_annual_x, self.item.rect().y()+self.dup_annual_y, self.item.rect().width(), self.item.rect().height()))
+        self.item.scene().addItem(self.new_item)
+        self.item.scene().setFocusItem(self.new_item)
+        if self.item.inherited_widget is None:
+            self.dup_annual_x += 20
+            self.dup_annual_y += 20
     def setItem(self, item):
         self.item = item
         # self.item.setParentItem(self)
@@ -92,34 +119,34 @@ class RectGizmo(QFrame):
 
         if not self.pressed:
             self.painter.setBrush(Qt.NoBrush)
-            self.painter.setPen(QPen(QColor('#A200D6'), 1))
+            self.painter.setPen(QPen(QColor('#41a4ee'), 1))
             self.painter.drawRect(
                 QRectF(self.rect().topLeft().x() + self.node_size / 2, self.rect().topLeft().y() + self.node_size / 2,
                        self.rect().width() - (self.node_size - 1), self.rect().height() - (self.node_size - 1)))
             self.painter.setBrush(QColor('white'))
-            self.painter.setPen(QPen(QColor('#A200D6'), 2))
-            self.painter.drawEllipse(
+            self.painter.setPen(QPen(QColor('#41a4ee'), 2))
+            self.painter.drawRect(
                 QRect(self.rect().topLeft().x() + 3, self.rect().topLeft().y() + 3, self.node_size, self.node_size))
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRect(self.rect().topRight().x() - (self.node_size + 1), self.rect().topRight().y() + 4, self.node_size,
                       self.node_size))
 
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRect(self.rect().bottomLeft().x() + 4, self.rect().bottomLeft().y() - (self.node_size + 1),
                       self.node_size, self.node_size))
 
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRectF(self.rect().width() - (self.node_size + 1), (self.rect().height() / 2) - self.node_size / 2,
                        self.node_size, self.node_size))
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRectF(2, (self.rect().height() / 2) - self.node_size / 2, self.node_size, self.node_size))
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRectF(self.rect().width() / 2 - self.node_size / 2, 2, self.node_size, self.node_size))
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRectF(self.rect().width() / 2 - self.node_size / 2, self.rect().height() - (self.node_size + 1),
                        self.node_size, self.node_size))
 
-            self.painter.drawEllipse(
+            self.painter.drawRect(
                 QRect(self.rect().bottomRight().x() - (self.node_size + 1),
                       self.rect().bottomRight().y() - (self.node_size + 1), self.node_size, self.node_size))
 
@@ -289,7 +316,7 @@ class RectGizmo(QFrame):
         self.item.setOpacity(1)
         self.setFixedSize(int(self.item.rect().size().width() + 15), int(self.item.rect().size().height() + 15))
         self.hide()
-        self.new_frame = RectGizmo(self.list, self.all_items)
+        self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
         self.gizmos.append(self.new_frame)
         self.new_frame.setItem(self.item)
         self.item.scene().addWidget(self.new_frame)
@@ -314,7 +341,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items)
+            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -334,7 +361,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items)
+            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -354,7 +381,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items)
+            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -374,7 +401,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items)
+            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -389,6 +416,9 @@ class RectGizmo(QFrame):
             self.deleteLater()
         elif a0.key() == Qt.Key_Shift:
             self.proportional = True
+        elif a0.key() == Qt.Key_Delete:
+            self.item.scene().removeItem(self.item)
+            self.deleteLater()
     def moveBy(self, item, x, y):
         self.rec = QRectF(item.rect())
         self.new_rect = self.rec.translated(x, y)
@@ -434,13 +464,16 @@ class RectGizmo(QFrame):
             self.moveBy(item, 0, -self.object_move_speed)
         elif a0.key() == Qt.Key_Shift:
             self.proportional = True
+        elif a0.key() == Qt.Key_Delete:
+            # print('item')
+            item.scene().removeItem(item)
+            # self.item.scene().removeItem(self.item)
+            self.deleteLater()
     def keyPressEvent(self, a0: QtGui.QKeyEvent) -> None:
         # print(self.all_items)
         if len(self.all_items) > 1:
             for item in self.all_items:
-                # self.list = []
-                if item != self.item:
-                    self.handle_multi_movement(a0, item)
+                self.handle_multi_movement(a0, item)
         else:
             self.handle_movement(a0)
 
@@ -451,8 +484,16 @@ class GraphicsView(QGraphicsView):
         self.scene().selectionChanged.connect(self.object_selected)
         # self.scene()
 
+        self.shortcut_paste = QShortcut(QKeySequence('ctrl+v'), self)
+        self.shortcut_paste.activated.connect(self.paste_item)
+
         self.selected_item = []
         self.gizmos = []
+        self.shift_pressed = False
+
+        self.items_to_paste = []
+
+        self.setStyleSheet("""selection-background-color: #41a4ee; border: 0px;""")
 
         self.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
@@ -468,14 +509,12 @@ class GraphicsView(QGraphicsView):
         self.board.setBrush(QColor('white'))
 
         self.demo_rect = Ellipse()
-        self.demo_rect.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         self.demo_rect.setPen(QPen(Qt.NoPen))
         self.demo_rect.setPen(QPen(QColor('black'), .5))
         self.demo_rect.setBrush(QColor('blue'))
         self.demo_rect.setRect(50, 50, 100, 100)
 
         self.demo_rect2 = Rectangle()
-        self.demo_rect2.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         self.demo_rect2.setPen(QPen(QColor('black'), .5))
         self.demo_rect2.setBrush(QColor('#d9d9d9'))
         self.demo_rect2.setRect(50, 50, 100, 100)
@@ -490,24 +529,35 @@ class GraphicsView(QGraphicsView):
         self.scene().addItem(self.demo_rect2)
         self.scene().addItem(self.demo_rect3)
 
+        self.grabKeyboard()
+        # self.grabMouse()
+        # self.setMouseTracking(True)
+
+
     def object_selected(self):
-        # print('yes')
         for item in self.gizmos:
             item.close_all()
             item.deleteLater()
-        # self.gizmos.remove()
         self.gizmos = []
         self.selected_item = []
         if self.scene().selectedItems() != []:
             for item in self.scene().selectedItems():
                 if item not in self.selected_item:
                     self.selected_item.append(item)
-                    self.gizmo = RectGizmo(self.gizmos, self.selected_item)
+                    self.gizmo = RectGizmo(self.gizmos, self.selected_item, self.items_to_paste)
                     self.gizmo.setItem(item)
                     self.scene().addWidget(self.gizmo)
                     self.gizmos.append(self.gizmo)
         self.update()
         self.scene().update()
+    def paste_item(self):
+        for items in self.items_to_paste:
+            self.pasted_item = items[0]()
+            self.pasted_item.setRect(items[1].rect())
+            self.pasted_item.setPen(items[1].pen())
+            self.pasted_item.setBrush(items[1].brush())
+            self.scene().addItem(self.pasted_item)
+        self.items_to_paste = []
 
 
 class MyApp(QApplication):
@@ -536,19 +586,20 @@ class MyApp(QApplication):
         # self.scene.del
         self.view = GraphicsView(self.scene)
         self.view.setBackgroundBrush(QColor('#D9D9D9'))
-        self.view.setStyleSheet("""border: 0px;""")
+        # self.view.setStyleSheet("""border: 0px;""")
         self.body_layout.addWidget(self.view)
 
         self.main.setCentralWidget(self.body)
 
     def change_item_color(self):
-        self.color_diag = QColorDialog()
-        self.color_diag.colorSelected.connect(self.selected_color)
-        self.color_diag.show()
-        # print(self.scene.selectedItems())
+        if self.scene.selectedItems() != []:
+            self.color_diag = QColorDialog(self.scene.selectedItems()[0].brush().color())
+            self.color_diag.colorSelected.connect(self.selected_color)
+            self.color_diag.show()
 
     def change_bg(self):
-        self.color_diag = QColorDialog()
+        # if self.scene.selectedItems() != []:
+        self.color_diag = QColorDialog(self.view.board.brush().color())
         self.color_diag.colorSelected.connect(self.background_color)
         self.color_diag.show()
 
@@ -556,19 +607,19 @@ class MyApp(QApplication):
         self.view.board.setBrush(QBrush(QColor(self.color_diag.selectedColor().name())))
 
     def change_item_pen_color(self):
-        self.color_diag = QColorDialog()
-        self.color_diag.colorSelected.connect(self.pen_color)
-        self.color_diag.show()
+        # print(self.view.demo_rect.pen().color().name())
+        if self.scene.selectedItems() != []:
+            self.color_diag = QColorDialog()
+            self.color_diag.colorSelected.connect(self.pen_color)
+            self.color_diag.show()
 
     def selected_color(self):
-        if self.scene.selectedItems() != []:
-            for item in self.scene.selectedItems():
-                item.setBrush(QColor(self.color_diag.selectedColor().name()))
+        for item in self.scene.selectedItems():
+            item.setBrush(QColor(self.color_diag.selectedColor().name()))
 
     def pen_color(self):
-        if self.scene.selectedItems() != []:
-            for item in self.scene.selectedItems():
-                item.setPen(QColor(self.color_diag.selectedColor().name()))
+        for item in self.scene.selectedItems():
+            item.setPen(QColor(self.color_diag.selectedColor().name()))
 
     def run(self):
         self.main.show()
