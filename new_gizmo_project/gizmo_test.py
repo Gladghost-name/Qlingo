@@ -1,6 +1,3 @@
-# Note: This is a test demo, Use at your own risk!.
-# Warning: More than 300 lines of code!
-# ------------------------------------------------------ >
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 import sys
@@ -19,6 +16,10 @@ class Rectangle(QGraphicsRectItem):
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
 
+        if is_selected:
+            # custom paint
+            pass
+
 
 class Ellipse(QGraphicsEllipseItem):
     def __init__(self):
@@ -30,12 +31,20 @@ class Ellipse(QGraphicsEllipseItem):
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
 
+        if is_selected:
+            # custom paint
+            pass
+
 
 class RectGizmo(QFrame):
     def __init__(self, gizmos_list):
         super().__init__()
         self.setStyleSheet("""background-color: transparent;""")
         self.item = None
+        # self.setBaseSize()
+        # self.grabMouse()
+        self.proportional = False
+
         self.dragging = 'None'
         self.list = gizmos_list
         self.cur = Qt.SizeAllCursor
@@ -48,19 +57,20 @@ class RectGizmo(QFrame):
         self.directer.hide()
 
         self.gizmos = []
-
-        # get the keyboard input!.
         self.grabKeyboard()
 
-        # setting the node size and offset!
         self.node_size = 13
         self.node_offset = 2
 
     def setItem(self, item):
-        # Set the item to be displayed and controlled by the gizmo!
         self.item = item
+        # self.item.setParentItem(self)
+        # self.setParent(self.item)
         self.cur_x = self.item.rect().x() - self.node_size / 2
         self.cur_y = self.item.rect().y() - self.node_size / 2
+
+        # print(self.item)
+        # print(self.cur_x, self.cur_y)
 
         self.move(int(self.cur_x), int(self.cur_y))
         self.setFixedSize(int(self.item.rect().width() + self.node_size),
@@ -68,6 +78,7 @@ class RectGizmo(QFrame):
 
     def paintEvent(self, a0: QPaintEvent) -> None:
         self.painter = QPainter(self)
+
         self.move(int(self.cur_x), int(self.cur_y))
         self.setFixedSize(int(self.item.rect().size().width() + self.node_size),
                           int(self.item.rect().size().height() + self.node_size))
@@ -111,7 +122,8 @@ class RectGizmo(QFrame):
         return super().paintEvent(a0)
 
     def mouseMoveEvent(self, a0):
-        # handle all the various dragging of corners!
+        # self.item.setRec
+        # print(a0.y())
         if a0.x() <= self.rect().topLeft().x() + 15 and a0.y() <= self.rect().topLeft().y() + 15:
             self.directer.show()
             self.directer.setFixedSize(10, 10)
@@ -181,7 +193,10 @@ class RectGizmo(QFrame):
             self.move_x = self.pos_x
             self.move_y = self.pos_y
             if self.cur_dragging == 'bottomRight':
-                self.item.setRect(QRectF(self.item.rect().x(), self.item.rect().y(), self.move_x, self.move_y))
+                if self.proportional:
+                    self.item.setRect(QRectF(self.item.rect().x(), self.item.rect().y(), self.move_y, self.move_y))
+                else:
+                    self.item.setRect(QRectF(self.item.rect().x(), self.item.rect().y(), self.move_x, self.move_y))
                 self.update()
                 self.item.scene().update()
             elif self.cur_dragging == 'right':
@@ -200,21 +215,30 @@ class RectGizmo(QFrame):
             elif self.cur_dragging == 'bottomLeft':
                 # self.item.rect().setLeft(a0.x())
                 self.rec = QRectF(self.item.rect())
-                self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), 0, 0, -(self.pos_y - a0.y()))
+                if self.proportional:
+                    self.new_rect = self.rec.adjusted((self.pos_y - a0.y()), 0, 0, -(self.pos_y - a0.y()))
+                else:
+                    self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), 0, 0, -(self.pos_y - a0.y()))
                 self.item.setRect(self.new_rect)
                 self.item.update()
                 self.update()
                 self.item.scene().update()
             elif self.cur_dragging == 'topLeft':
                 self.rec = QRectF(self.item.rect())
-                self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), -(self.pos_y - a0.y()), 0, 0)
+                if self.proportional:
+                    self.new_rect = self.rec.adjusted(-(self.pos_y - a0.y()), -(self.pos_y - a0.y()), 0 , 0)
+                else:
+                    self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), -(self.pos_y - a0.y()), 0, 0)
                 self.item.setRect(self.new_rect)
                 self.item.update()
                 self.update()
                 self.item.scene().update()
             elif self.cur_dragging == 'topRight':
                 self.rec = QRectF(self.item.rect())
-                self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), -(self.pos_x - a0.x()), 0)
+                if self.proportional:
+                    self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), (self.pos_y - a0.y()), 0)
+                else:
+                    self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), -(self.pos_x - a0.x()), 0)
                 self.item.setRect(self.new_rect)
                 self.item.update()
                 self.update()
@@ -245,8 +269,9 @@ class RectGizmo(QFrame):
     def mousePressEvent(self, a0):
         self.pos_x = a0.x()
         self.pos_y = a0.y()
+        # self.cur_x = self.pos_x
+        # self.cur_y = a0.y()
         if self.dragging != 'None':
-            # start dragging the item!
             self.item.setOpacity(.5)
             self.pressed = True
             self.cur_width = self.item.rect().width()
@@ -254,7 +279,6 @@ class RectGizmo(QFrame):
         self.update()
 
     def mouseReleaseEvent(self, *args, **kwargs):
-        # update the item and its constituents!
         self.pressed = False
         self.item.setOpacity(1)
         self.setFixedSize(int(self.item.rect().size().width() + 15), int(self.item.rect().size().height() + 15))
@@ -266,12 +290,12 @@ class RectGizmo(QFrame):
         self.update()
         self.item.scene().update()
         self.list.append(self.new_frame)
+        # print(self.item.scene().items())
         if self in self.list:
             self.list.remove(self)
         self.deleteLater()
 
     def close_all(self):
-        # remove all the gizmos displayed!
         for widget in self.gizmos:
             widget.deleteLater()
 
@@ -294,6 +318,7 @@ class RectGizmo(QFrame):
 
             if self in self.list:
                 self.list.remove(self)
+            # print(self.list)
             self.deleteLater()
         elif a0.key() == Qt.Key_Left:
             self.rec = QRectF(self.item.rect())
@@ -313,6 +338,7 @@ class RectGizmo(QFrame):
 
             if self in self.list:
                 self.list.remove(self)
+            # print(self.list)
             self.deleteLater()
         elif a0.key() == Qt.Key_Down:
             self.rec = QRectF(self.item.rect())
@@ -332,6 +358,7 @@ class RectGizmo(QFrame):
 
             if self in self.list:
                 self.list.remove(self)
+            # print(self.list)
             self.deleteLater()
         elif a0.key() == Qt.Key_Up:
             self.rec = QRectF(self.item.rect())
@@ -351,7 +378,11 @@ class RectGizmo(QFrame):
 
             if self in self.list:
                 self.list.remove(self)
+            # print(self.list)
             self.deleteLater()
+        elif a0.key() == Qt.Key_Shift:
+            self.proportional = True
+
 
 class GraphicsView(QGraphicsView):
     def __init__(self, scene):
@@ -365,6 +396,7 @@ class GraphicsView(QGraphicsView):
         self.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
         self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setRubberBandSelectionMode(Qt.ItemSelectionMode.ContainsItemShape)
 
         self.board = QGraphicsRectItem()
         self.board.setRect(20, 20, 700, 500)
@@ -376,28 +408,31 @@ class GraphicsView(QGraphicsView):
         self.demo_rect = Ellipse()
         self.demo_rect.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         self.demo_rect.setPen(QPen(Qt.NoPen))
+        self.demo_rect.setPen(QPen(QColor('black'), .5))
         self.demo_rect.setBrush(QColor('blue'))
         self.demo_rect.setRect(50, 50, 100, 100)
 
         self.demo_rect2 = Rectangle()
         self.demo_rect2.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
-        self.demo_rect2.setPen(QPen(Qt.NoPen))
-        self.demo_rect2.setBrush(QColor('blue'))
+        self.demo_rect2.setPen(QPen(QColor('black'), .5))
+        self.demo_rect2.setBrush(QColor('#d9d9d9'))
         self.demo_rect2.setRect(50, 50, 100, 100)
 
         self.scene().addItem(self.demo_rect)
         self.scene().addItem(self.demo_rect2)
 
     def object_selected(self):
+        # print('yes')
         for item in self.gizmos:
+            # if item in self.scene().items():
             item.close_all()
             item.deleteLater()
+        # self.gizmos.remove()
         self.gizmos = []
         self.selected_item = []
         if self.scene().selectedItems() != []:
             for item in self.scene().selectedItems():
                 if item not in self.selected_item:
-                    # create a gizmo for selected item.
                     self.gizmo = RectGizmo(self.gizmos)
                     self.gizmo.setItem(item)
                     self.scene().addWidget(self.gizmo)
@@ -421,6 +456,10 @@ class MyApp(QApplication):
         self.change_color.clicked.connect(self.change_item_color)
         self.body_layout.addWidget(self.change_color)
 
+        self.change_pen = QPushButton("Change item pen color!")
+        self.change_pen.clicked.connect(self.change_item_pen_color)
+        self.body_layout.addWidget(self.change_pen)
+
         self.scene = QGraphicsScene()
         # self.scene.del
         self.view = GraphicsView(self.scene)
@@ -434,17 +473,29 @@ class MyApp(QApplication):
         self.color_diag = QColorDialog()
         self.color_diag.colorSelected.connect(self.selected_color)
         self.color_diag.show()
+        # print(self.scene.selectedItems())
+
+    def change_item_pen_color(self):
+        self.color_diag = QColorDialog()
+        self.color_diag.colorSelected.connect(self.pen_color)
+        self.color_diag.show()
 
     def selected_color(self):
-        if self.scene.selectedItems():
+        if self.scene.selectedItems() != []:
             for item in self.scene.selectedItems():
                 item.setBrush(QColor(self.color_diag.selectedColor().name()))
+            # print(self.color_diag.selectedColor().name())
+
+    def pen_color(self):
+        if self.scene.selectedItems() != []:
+            for item in self.scene.selectedItems():
+                item.setPen(QColor(self.color_diag.selectedColor().name()))
 
     def run(self):
         self.main.show()
         sys.exit(self.exec())
 
-# You can simply run the program from here!.
+
 if __name__ == '__main__':
     app = MyApp()
     app.run()
