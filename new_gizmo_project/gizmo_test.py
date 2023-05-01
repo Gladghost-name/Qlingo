@@ -528,6 +528,10 @@ class MyApp(QApplication):
         self.change_pen.clicked.connect(self.change_item_pen_color)
         self.body_layout.addWidget(self.change_pen)
 
+        self.change_bg_color = QPushButton("Change background color")
+        self.change_bg_color.clicked.connect(self.change_bg)
+        self.body_layout.addWidget(self.change_bg_color)
+
         self.scene = QGraphicsScene()
         # self.scene.del
         self.view = GraphicsView(self.scene)
@@ -542,6 +546,14 @@ class MyApp(QApplication):
         self.color_diag.colorSelected.connect(self.selected_color)
         self.color_diag.show()
         # print(self.scene.selectedItems())
+
+    def change_bg(self):
+        self.color_diag = QColorDialog()
+        self.color_diag.colorSelected.connect(self.background_color)
+        self.color_diag.show()
+
+    def background_color(self):
+        self.view.board.setBrush(QBrush(QColor(self.color_diag.selectedColor().name())))
 
     def change_item_pen_color(self):
         self.color_diag = QColorDialog()
