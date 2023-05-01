@@ -21,24 +21,17 @@ class Rectangle(QGraphicsRectItem):
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
 
-        if is_selected:
-            # custom paint
-            pass
-
 
 class Ellipse(QGraphicsEllipseItem):
     def __init__(self):
         super().__init__()
+        self.inherited_widget = None
         self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
         # Remove default paint from selection
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
-
-        if is_selected:
-            # custom paint
-            pass
 
 
 class RectGizmo(QFrame):
@@ -299,17 +292,16 @@ class RectGizmo(QFrame):
             self.update()
 
     def mousePressEvent(self, a0):
-        self.all_items = []
-        self.pos_x = a0.x()
-        self.pos_y = a0.y()
-        # self.cur_x = self.pos_x
-        # self.cur_y = a0.y()
-        if self.dragging != 'None':
-            self.item.setOpacity(.5)
-            self.pressed = True
-            self.cur_width = self.item.rect().width()
-            self.cur_dragging = self.dragging
-        self.update()
+        if a0.button() == Qt.LeftButton:
+            self.all_items = []
+            self.pos_x = a0.x()
+            self.pos_y = a0.y()
+            if self.dragging != 'None':
+                self.item.setOpacity(.5)
+                self.pressed = True
+                self.cur_width = self.item.rect().width()
+                self.cur_dragging = self.dragging
+            self.update()
 
     def mouseReleaseEvent(self, *args, **kwargs):
         self.pressed = False
@@ -438,12 +430,12 @@ class RectGizmo(QFrame):
         for gizmo in self.list:
             gizmo.hide()
 
-        self.new_frame = RectGizmo(self.list, self.all_items)
+        self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
         self.list.append(self.new_frame)
         self.new_frame.setItem(item)
         item.scene().addWidget(self.new_frame)
 
-        self.new_frame = RectGizmo(self.list, self.all_items)
+        self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
         self.list.append(self.new_frame)
         self.new_frame.setItem(self.item)
         self.item.scene().addWidget(self.new_frame)
