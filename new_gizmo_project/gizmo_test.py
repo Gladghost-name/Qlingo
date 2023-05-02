@@ -13,6 +13,7 @@ class Rectangle(QGraphicsRectItem):
     def __init__(self):
         super().__init__()
         self.inherited_widget = None
+        self.gizmo = None
         self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
 
     def paint(self, painter, option, widget):
@@ -26,6 +27,7 @@ class Ellipse(QGraphicsEllipseItem):
     def __init__(self):
         super().__init__()
         self.inherited_widget = None
+        self.gizmo = None
         self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
@@ -74,7 +76,7 @@ class RectGizmo(QFrame):
     def copy_item(self):
         self.objects_to_paste.append([type(self.item), self.item])
     def duplicate_item(self):
-        if self.item.inherited_widget is not None:
+        if self.item.inherited_widget is not None and self.item.inherited_widget in self.item.scene().items():
             self.dup_annual_x += self.item.rect().x()-self.item.inherited_widget.rect().x()
             self.dup_annual_y += self.item.rect().y() - self.item.inherited_widget.rect().y()
         self.new_item = type(self.item)()
@@ -91,6 +93,7 @@ class RectGizmo(QFrame):
         self.item = item
         # self.item.setParentItem(self)
         # self.setParent(self.item)
+        self.item.gizmo = self
         self.cur_x = self.item.rect().x() - self.node_size / 2
         self.cur_y = self.item.rect().y() - self.node_size / 2
 
@@ -108,7 +111,7 @@ class RectGizmo(QFrame):
         self.setFixedSize(int(self.item.rect().size().width() + self.node_size),
                           int(self.item.rect().size().height() + self.node_size))
 
-        self.painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
+        # self.painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
         if not self.pressed:
             self.painter.setBrush(Qt.NoBrush)
@@ -274,12 +277,15 @@ class RectGizmo(QFrame):
                 self.update()
                 self.item.scene().update()
             elif self.cur_dragging == 'center':
-                self.rec = QRectF(self.item.rect())
-                self.new_rect = self.rec.translated(-(self.pos_x - a0.x()), -(self.pos_y - a0.y()))
-                self.item.setRect(self.new_rect)
-                self.item.update()
-                self.update()
-                self.item.scene().update()
+                for item in self.all_items:
+                    self.rec = QRectF(item.rect())
+                    self.new_rect = self.rec.translated(-(self.pos_x - a0.x()), -(self.pos_y - a0.y()))
+                    item.setRect(self.new_rect)
+                    item.update()
+                    # self.hide()
+                    self.pressed = True
+                    self.update()
+                    item.scene().update()
             elif self.cur_dragging == 'top':
                 self.rec = QRectF(self.item.rect())
                 self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), 0, 0)
@@ -293,32 +299,42 @@ class RectGizmo(QFrame):
 
     def mousePressEvent(self, a0):
         if a0.button() == Qt.LeftButton:
-            self.all_items = []
+            # self.all_items = []
             self.pos_x = a0.x()
             self.pos_y = a0.y()
             if self.dragging != 'None':
-                self.item.setOpacity(.5)
-                self.pressed = True
+                if self.dragging != 'center':
+                    self.item.setOpacity(.5)
+                for i in self.all_items:
+                    i.gizmo.pressed = True
+                    if i is not self.item:
+                        i.gizmo.pos_x = a0.x()
+                        i.gizmo.pos_y = a0.y()
+                        i.gizmo.cur_width = i.rect().width()
+                        i.gizmo.cur_dragging = self.dragging
+                        i.gizmo.update()
+                # self.pressed = True
                 self.cur_width = self.item.rect().width()
                 self.cur_dragging = self.dragging
             self.update()
 
     def mouseReleaseEvent(self, *args, **kwargs):
-        self.pressed = False
-        self.item.setOpacity(1)
-        self.setFixedSize(int(self.item.rect().size().width() + 15), int(self.item.rect().size().height() + 15))
-        self.hide()
-        self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
-        self.gizmos.append(self.new_frame)
-        self.new_frame.setItem(self.item)
-        self.item.scene().addWidget(self.new_frame)
-        self.update()
-        self.item.scene().update()
-        self.list.append(self.new_frame)
-        # print(self.item.scene().items())
-        if self in self.list:
-            self.list.remove(self)
-        self.deleteLater()
+        for item in self.all_items:
+            self.pressed = False
+            item.setOpacity(1)
+            self.setFixedSize(int(item.rect().size().width() + 15), int(item.rect().size().height() + 15))
+            self.hide()
+            self.new_frame = RectGizmo(item.gizmo.list, item.gizmo.all_items, item.gizmo.objects_to_paste)
+            self.gizmos.append(self.new_frame)
+            self.new_frame.setItem(item)
+            item.scene().addWidget(self.new_frame)
+            self.update()
+            item.scene().update()
+            self.list.append(self.new_frame)
+            # print(self.item.scene().items())
+            if self in self.list:
+                self.list.remove(self)
+            self.deleteLater()
 
     def close_all(self):
         # self.all_items = []
@@ -485,7 +501,7 @@ class GraphicsView(QGraphicsView):
 
         self.items_to_paste = []
 
-        self.setStyleSheet("""selection-background-color: #41a4ee; border: 0px;""")
+        self.setStyleSheet("""selection-background-color: #272727; border: 0px;""")
 
         self.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
@@ -522,8 +538,6 @@ class GraphicsView(QGraphicsView):
         self.scene().addItem(self.demo_rect3)
 
         self.grabKeyboard()
-        # self.grabMouse()
-        # self.setMouseTracking(True)
 
 
     def object_selected(self):
@@ -555,8 +569,14 @@ class GraphicsView(QGraphicsView):
 class MyApp(QApplication):
     def __init__(self):
         super().__init__(sys.argv)
+        super().__init__(sys.argv)
         self.main = QMainWindow()
         self.main.resize(850, 600)
+
+        # Test for undo and redo functionality.
+        # self.undo_stack = QUndoStack()
+        # self.commend = QUndoCommand()
+        # self.undo_stack.push(self.command)
 
         self.body = QFrame()
         self.body_layout = QVBoxLayout()
