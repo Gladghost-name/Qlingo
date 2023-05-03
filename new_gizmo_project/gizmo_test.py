@@ -217,85 +217,85 @@ class RectGizmo(QFrame):
             self.setCursor(self.cur)
 
         if self.pressed:
-            # self.setCursor(Qt.CrossCursor)
-            self.move_x = self.pos_x
-            self.move_y = self.pos_y
-            if self.cur_dragging == 'bottomRight':
-                if self.proportional:
-                    self.item.setRect(QRectF(self.item.rect().x(), self.item.rect().y(), self.move_y, self.move_y))
-                else:
-                    self.item.setRect(QRectF(self.item.rect().x(), self.item.rect().y(), self.move_x, self.move_y))
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'right':
-                self.item.setRect(
-                    QRectF(self.item.rect().x(), self.item.rect().y(), self.move_x, self.item.rect().height()))
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'left':
-                # self.item.rect().setLeft(a0.x())
-                self.rec = QRectF(self.item.rect())
-                self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), 0, 0, 0)
-                self.item.setRect(self.new_rect)
-                self.item.update()
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'bottomLeft':
-                # self.item.rect().setLeft(a0.x())
-                self.rec = QRectF(self.item.rect())
-                if self.proportional:
-                    self.new_rect = self.rec.adjusted((self.pos_y - a0.y()), 0, 0, -(self.pos_y - a0.y()))
-                else:
-                    self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), 0, 0, -(self.pos_y - a0.y()))
-                self.item.setRect(self.new_rect)
-                self.item.update()
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'topLeft':
-                self.rec = QRectF(self.item.rect())
-                if self.proportional:
-                    self.new_rect = self.rec.adjusted(-(self.pos_y - a0.y()), -(self.pos_y - a0.y()), 0 , 0)
-                else:
-                    self.new_rect = self.rec.adjusted(-(self.pos_x - a0.x()), -(self.pos_y - a0.y()), 0, 0)
-                self.item.setRect(self.new_rect)
-                self.item.update()
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'topRight':
-                self.rec = QRectF(self.item.rect())
-                if self.proportional:
-                    self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), (self.pos_y - a0.y()), 0)
-                else:
-                    self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), -(self.pos_x - a0.x()), 0)
-                self.item.setRect(self.new_rect)
-                self.item.update()
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'bottom':
-                self.item.setRect(
-                    QRectF(self.item.rect().x(), self.item.rect().y(), self.item.rect().width(), self.move_y))
-                self.update()
-                self.item.scene().update()
-            elif self.cur_dragging == 'center':
-                for item in self.all_items:
-                    self.rec = QRectF(item.rect())
-                    self.new_rect = self.rec.translated(-(self.pos_x - a0.x()), -(self.pos_y - a0.y()))
-                    item.setRect(self.new_rect)
-                    item.update()
-                    # self.hide()
-                    self.pressed = True
+            for item in self.all_items:
+                # self.setCursor(Qt.CrossCursor)
+                self.move_x = item.gizmo.pos_x
+                self.move_y = item.gizmo.pos_y
+                if self.cur_dragging == 'bottomRight':
+                    if self.proportional:
+                        item.setRect(QRectF(item.rect().x(), item.rect().y(), self.move_y, self.move_y))
+                    else:
+                        item.setRect(QRectF(item.rect().x(), item.rect().y(), self.move_x, self.move_y))
                     self.update()
                     item.scene().update()
-            elif self.cur_dragging == 'top':
-                self.rec = QRectF(self.item.rect())
-                self.new_rect = self.rec.adjusted(0, -(self.pos_y - a0.y()), 0, 0)
-                self.item.setRect(self.new_rect)
-                self.item.update()
+                elif self.cur_dragging == 'right':
+                    item.setRect(
+                        QRectF(item.rect().x(), item.rect().y(), self.move_x, item.rect().height()))
+                    self.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'left':
+                    # self.item.rect().setLeft(a0.x())
+                    self.rec = QRectF(item.rect())
+                    self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), 0, 0, 0)
+                    item.setRect(self.new_rect)
+                    item.update()
+                    self.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'bottomLeft':
+                    # self.item.rect().setLeft(a0.x())
+                    self.rec = QRectF(item.rect())
+                    if self.proportional:
+                        self.new_rect = self.rec.adjusted((item.gizmo.pos_y - a0.y()), 0, 0, -(item.gizmo.pos_y - a0.y()))
+                    else:
+                        self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), 0, 0, -(item.gizmo.pos_y - a0.y()))
+                    item.setRect(self.new_rect)
+                    item.update()
+                    self.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'topLeft':
+                    self.rec = QRectF(item.rect())
+                    if self.proportional:
+                        self.new_rect = self.rec.adjusted(-(item.gizmo.pos_y - a0.y()), -(item.gizmo.pos_y - a0.y()), 0 , 0)
+                    else:
+                        self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), -(item.gizmo.pos_y - a0.y()), 0, 0)
+                    item.setRect(self.new_rect)
+                    item.update()
+                    self.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'topRight':
+                    self.rec = QRectF(item.rect())
+                    if self.proportional:
+                        self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), (item.gizmo.pos_y - a0.y()), 0)
+                    else:
+                        self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), -(item.gizmo.pos_x - a0.x()), 0)
+                    item.setRect(self.new_rect)
+                    item.update()
+                    self.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'bottom':
+                    item.setRect(
+                        QRectF(item.rect().x(), item.rect().y(), item.rect().width(), item.gizmo.move_y))
+                    self.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'center':
+                    # for item in self.all_items:
+                    self.rec = QRectF(item.rect())
+                    self.new_rect = self.rec.translated(-(item.gizmo.pos_x - a0.x()), -(item.gizmo.pos_y - a0.y()))
+                    item.setRect(self.new_rect)
+                    self.pressed = True
+                    item.gizmo.update()
+                    item.update()
+                    item.scene().update()
+                elif self.cur_dragging == 'top':
+                    self.rec = QRectF(item.rect())
+                    self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), 0, 0)
+                    item.setRect(self.new_rect)
+                    item.update()
+                    self.update()
+                    item.scene().update()
+                item.gizmo.pos_x = a0.x()
+                item.gizmo.pos_y = a0.y()
                 self.update()
-                self.item.scene().update()
-            self.pos_x = a0.x()
-            self.pos_y = a0.y()
-            self.update()
 
     def mousePressEvent(self, a0):
         if a0.button() == Qt.LeftButton:
@@ -313,31 +313,34 @@ class RectGizmo(QFrame):
                         i.gizmo.cur_width = i.rect().width()
                         i.gizmo.cur_dragging = self.dragging
                         i.gizmo.update()
+                        i.update()
                 # self.pressed = True
                 self.cur_width = self.item.rect().width()
                 self.cur_dragging = self.dragging
             self.update()
 
-    def mouseReleaseEvent(self, *args, **kwargs):
-        for item in self.all_items:
-            self.pressed = False
-            item.setOpacity(1)
-            self.setFixedSize(int(item.rect().size().width() + 15), int(item.rect().size().height() + 15))
-            self.hide()
-            self.new_frame = RectGizmo(item.gizmo.list, item.gizmo.all_items, item.gizmo.objects_to_paste)
-            self.gizmos.append(self.new_frame)
-            self.new_frame.setItem(item)
-            item.scene().addWidget(self.new_frame)
+    def mouseReleaseEvent(self, a0):
+        if a0.button() == Qt.LeftButton:
+            for item in self.all_items:
+                self.pressed = False
+                item.setOpacity(1)
+                self.setFixedSize(int(item.rect().size().width() + 15), int(item.rect().size().height() + 15))
+                self.hide()
+                self.new_frame = RectGizmo(item.gizmo.list, item.gizmo.all_items, item.gizmo.objects_to_paste)
+                self.gizmos.append(self.new_frame)
+                self.new_frame.setItem(item)
+                item.scene().addWidget(self.new_frame)
+                item.gizmo.update()
+                # item.gizmo.update()
+                item.scene().update()
+                item.gizmo.list.append(self.new_frame)
+                if self in item.gizmo.list:
+                    self.list.remove(self)
+                self.deleteLater()
+                # item.gizmo.deleteLater()
             self.update()
-            item.scene().update()
-            self.list.append(self.new_frame)
-            # print(self.item.scene().items())
-            if self in self.list:
-                self.list.remove(self)
-            self.deleteLater()
 
     def close_all(self):
-        # self.all_items = []
         for widget in self.list:
             widget.deleteLater()
 
