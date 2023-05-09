@@ -1,0 +1,112 @@
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.Qt import *
+
+class Rectangle(QGraphicsRectItem):
+    def __init__(self):
+        super().__init__()
+        self.inherited_widget = None
+        self.gizmo = None
+        self.x = self.rect().x()
+        self.y = self.rect().y()
+        self.width = self.rect().width()
+        self.height = self.rect().height()
+        self.setBrush(QColor('black'))
+        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
+        # self.setBrush(QColor('black'))
+    def paint(self, painter, option, widget):
+        is_selected = option.state & QStyle.State_Selected
+        # Remove default paint from selection
+        self.x = self.rect().x()
+        self.y = self.rect().y()
+        self.width = self.rect().width()
+        self.height = self.rect().height()
+        option.state &= ~QStyle.State_Selected
+        super().paint(painter, option, widget)
+
+
+class Ellipse(QGraphicsEllipseItem):
+    def __init__(self):
+        super().__init__()
+        self.inherited_widget = None
+        self.gizmo = None
+        self.x = self.rect().x()
+        self.y = self.rect().y()
+        self.width = self.rect().width()
+        self.height = self.rect().height()
+        self.setBrush(QColor('black'))
+        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
+    def paint(self, painter, option, widget):
+        is_selected = option.state & QStyle.State_Selected
+        # Remove default paint from selection
+        self.x = self.rect().x()
+        self.y = self.rect().y()
+        self.width = self.rect().width()
+        self.height = self.rect().height()
+        option.state &= ~QStyle.State_Selected
+        super().paint(painter, option, widget)
+
+class Pixmap(QGraphicsPixmapItem):
+    def __init__(self):
+        super().__init__()
+        self.inherited_widget = None
+        self.gizmo = None
+
+        self.x = self.pos().x()
+        self.y = self.pos().y()
+        self.width = 100
+        self.height = 100
+        self.file_name = None
+
+        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
+    def paint(self, painter, option, widget):
+        is_selected = option.state & QStyle.State_Selected
+        # Remove default paint from selection
+        self.x = self.pos().x()
+        self.y = self.pos().y()
+        self.width = self.pixmap().width()
+        self.height = self.pixmap().height()
+        option.state &= ~QStyle.State_Selected
+        super().paint(painter, option, widget)
+    def setRect(self, rect):
+        if rect.width() != self.width or rect.height != self.height:
+            self.setPixmap(QPixmap(self.file_name).scaled(int(rect.width()), int(rect.height()), Qt.IgnoreAspectRatio))
+            self.width = self.pixmap().width()
+            self.height = self.pixmap().height()
+        # else:
+        self.setPos(rect.x(), rect.y())
+        self.update()
+    def rect(self):
+        return QRectF(self.x, self.y, self.width, self.height)
+
+class Entity():
+    def __init__(self, scene, type: str = ..., size: tuple = ..., pos: tuple = ..., color: str = 'black', pen_color: str = 'black', filename: str = ...):
+        super().__init__()
+        self.scene = scene
+        self.type = type
+        self.size = size
+        self.pos = pos
+        self.pen_color = pen_color
+        self.color = color
+    def draw(self):
+        match self.type:
+            case "rectangle":
+                self.item = Rectangle()
+                self.item.setPen(QColor(self.pen_color))
+                self.item.setBrush(QColor(self.color))
+                self.item.setRect(self.pos[0], self.pos[1], self.size[0], self.size[1])
+                self.scene.addItem(self.item)
+            case "ellipse":
+                self.item = Ellipse()
+                self.item.setPen(QColor(self.pen_color))
+                self.item.setBrush(QColor(self.color))
+                self.item.setRect(self.pos[0], self.pos[1], self.size[0], self.size[1])
+                self.scene.addItem(self.item)
+            case "pixmap":
+                self.item = Pixmap()
+                self.item.file_name = 'cat-image.jpg'
+                self.item.setPixmap(QPixmap('cat-image.jpg'))
+                self.scene.addItem(self.item)
+                self.item.setRect(QRectF(self.pos[0], self.pos[1], self.size[0], self.size[1]))

@@ -7,34 +7,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.Qt import *
-
-
-class Rectangle(QGraphicsRectItem):
-    def __init__(self):
-        super().__init__()
-        self.inherited_widget = None
-        self.gizmo = None
-        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
-
-    def paint(self, painter, option, widget):
-        is_selected = option.state & QStyle.State_Selected
-        # Remove default paint from selection
-        option.state &= ~QStyle.State_Selected
-        super().paint(painter, option, widget)
-
-
-class Ellipse(QGraphicsEllipseItem):
-    def __init__(self):
-        super().__init__()
-        self.inherited_widget = None
-        self.gizmo = None
-        self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
-    def paint(self, painter, option, widget):
-        is_selected = option.state & QStyle.State_Selected
-        # Remove default paint from selection
-        option.state &= ~QStyle.State_Selected
-        super().paint(painter, option, widget)
-
+from components import *
 
 class RectGizmo(QFrame):
     def __init__(self, gizmos_list, items, paste_objects):
@@ -94,22 +67,24 @@ class RectGizmo(QFrame):
         # self.item.setParentItem(self)
         # self.setParent(self.item)
         self.item.gizmo = self
-        self.cur_x = self.item.rect().x() - self.node_size / 2
-        self.cur_y = self.item.rect().y() - self.node_size / 2
+        self.cur_x = self.item.x - self.node_size / 2
+        self.cur_y = self.item.y - self.node_size / 2
 
         # print(self.item)
         # print(self.cur_x, self.cur_y)
 
         self.move(int(self.cur_x), int(self.cur_y))
-        self.setFixedSize(int(self.item.rect().width() + self.node_size),
-                          int(self.item.rect().height() + self.node_size))
+        self.setFixedSize(int(self.item.width + self.node_size),
+                          int(self.item.height + self.node_size))
 
     def paintEvent(self, a0: QPaintEvent) -> None:
         self.painter = QPainter(self)
 
         self.move(int(self.cur_x), int(self.cur_y))
-        self.setFixedSize(int(self.item.rect().size().width() + self.node_size),
-                          int(self.item.rect().size().height() + self.node_size))
+        # self.setFixedSize(int(self.item.rect().size().width() + self.node_size),
+        #                   int(self.item.rect().size().height() + self.node_size))
+        self.setFixedSize(int(self.item.width + self.node_size),
+                          int(self.item.height + self.node_size))
 
         # self.painter.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
@@ -315,7 +290,7 @@ class RectGizmo(QFrame):
                         i.gizmo.update()
                         i.update()
                 # self.pressed = True
-                self.cur_width = self.item.rect().width()
+                self.cur_width = self.item.width
                 self.cur_dragging = self.dragging
             self.update()
 
@@ -512,34 +487,25 @@ class GraphicsView(QGraphicsView):
         self.setRubberBandSelectionMode(Qt.ItemSelectionMode.ContainsItemShape)
 
         self.board = QGraphicsRectItem()
-        self.board.setRect(20, 20, 700, 500)
+        self.backdrop = QGraphicsDropShadowEffect()
+        self.backdrop.setBlurRadius(12.0)
+        self.backdrop.setOffset(0.4, 0.7)
+        self.backdrop.setColor(QColor('#CCCCCC'))
+        self.board.setGraphicsEffect(self.backdrop)
+
+        self.board.setRect(20, 20, 900, 500)
         # self.board.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         self.scene().addItem(self.board)
-
-        self.board.setPen(QPen(QColor('black'), .3))
+        self.board.setPen(QPen(Qt.NoPen))
         self.board.setBrush(QColor('white'))
 
-        self.demo_rect = Ellipse()
-        self.demo_rect.setPen(QPen(Qt.NoPen))
-        self.demo_rect.setPen(QPen(QColor('black'), .5))
-        self.demo_rect.setBrush(QColor('blue'))
-        self.demo_rect.setRect(50, 50, 100, 100)
+        self.demo_rect = Entity(self.scene(), 'pixmap', (200, 500), (50, 50))
+        self.demo_rect.draw()
+        self.scene().setFocusItem(self.demo_rect.item)
 
-        self.demo_rect2 = Rectangle()
-        self.demo_rect2.setPen(QPen(QColor('black'), .5))
-        self.demo_rect2.setBrush(QColor('#d9d9d9'))
-        self.demo_rect2.setRect(50, 50, 100, 100)
 
-        self.demo_rect3 = Rectangle()
-        self.demo_rect3.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
-        self.demo_rect3.setPen(QPen(QColor('black'), .5))
-        self.demo_rect3.setBrush(QColor('#d9d9d9'))
-        self.demo_rect3.setRect(50, 50, 100, 100)
-
-        self.scene().addItem(self.demo_rect)
-        self.scene().addItem(self.demo_rect2)
-        self.scene().addItem(self.demo_rect3)
-
+        self.demo_rect2 = Entity(self.scene(), 'rectangle', (100, 100), (50, 50), "black")
+        self.demo_rect2.draw()
         self.grabKeyboard()
 
 
@@ -596,6 +562,10 @@ class MyApp(QApplication):
         self.change_bg_color = QPushButton("Change background color")
         self.change_bg_color.clicked.connect(self.change_bg)
         self.body_layout.addWidget(self.change_bg_color)
+
+        # self.change_bg_color = QPushButton("Change background color")
+        # self.change_bg_color.clicked.connect(self.change_bg)
+        # self.body_layout.addWidget(self.change_bg_color)
 
         self.scene = QGraphicsScene()
         # self.scene.del
