@@ -53,10 +53,12 @@ class RectGizmo(QFrame):
             self.dup_annual_x += self.item.rect().x()-self.item.inherited_widget.rect().x()
             self.dup_annual_y += self.item.rect().y() - self.item.inherited_widget.rect().y()
         self.new_item = type(self.item)()
+        # print(self.new_item)
         self.new_item.inherited_widget = self.item
-        self.new_item.setBrush(self.item.brush())
-        self.new_item.setPen(self.item.pen())
-        self.new_item.setRect(QRectF(self.item.rect().x()+self.dup_annual_x, self.item.rect().y()+self.dup_annual_y, self.item.rect().width(), self.item.rect().height()))
+        if type(self.item) != Pixmap:
+            self.new_item.setBrush(self.item.brush())
+            self.new_item.setPen(self.item.pen())
+        self.new_item.setRect(QRectF(self.item.x+self.dup_annual_x, self.item.y+self.dup_annual_y, self.item.width, self.item.height))
         self.item.scene().addItem(self.new_item)
         self.item.scene().setFocusItem(self.new_item)
         if self.item.inherited_widget is None:
@@ -504,7 +506,7 @@ class GraphicsView(QGraphicsView):
         self.scene().setFocusItem(self.demo_rect.item)
 
 
-        self.demo_rect2 = Entity(self.scene(), 'rectangle', (100, 100), (50, 50), "black")
+        self.demo_rect2 = Entity(self.scene(), 'text', (100, 100), (50, 50), "black")
         self.demo_rect2.draw()
         self.grabKeyboard()
 
@@ -563,9 +565,13 @@ class MyApp(QApplication):
         self.change_bg_color.clicked.connect(self.change_bg)
         self.body_layout.addWidget(self.change_bg_color)
 
-        # self.change_bg_color = QPushButton("Change background color")
-        # self.change_bg_color.clicked.connect(self.change_bg)
-        # self.body_layout.addWidget(self.change_bg_color)
+        self.BringToFront = QPushButton("Bring to front!")
+        self.BringToFront.clicked.connect(self.bringfront)
+        self.body_layout.addWidget(self.BringToFront)
+
+        self.BringToBack = QPushButton("Bring to back!")
+        self.BringToBack.clicked.connect(self.bringback)
+        self.body_layout.addWidget(self.BringToBack)
 
         self.scene = QGraphicsScene()
         # self.scene.del
@@ -575,7 +581,14 @@ class MyApp(QApplication):
         self.body_layout.addWidget(self.view)
 
         self.main.setCentralWidget(self.body)
-
+    def bringfront(self):
+        for item in self.scene.selectedItems():
+            item.setZValue(1)
+            # print(item)
+    def bringback(self):
+        for item in self.scene.selectedItems():
+            item.setZValue(-1)
+            # print(item)
     def change_item_color(self):
         if self.scene.selectedItems() != []:
             self.color_diag = QColorDialog(self.scene.selectedItems()[0].brush().color())

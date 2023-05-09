@@ -4,6 +4,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.Qt import *
 
+
 class Rectangle(QGraphicsRectItem):
     def __init__(self):
         super().__init__()
@@ -16,6 +17,7 @@ class Rectangle(QGraphicsRectItem):
         self.setBrush(QColor('black'))
         self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
         # self.setBrush(QColor('black'))
+
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
         # Remove default paint from selection
@@ -38,6 +40,7 @@ class Ellipse(QGraphicsEllipseItem):
         self.height = self.rect().height()
         self.setBrush(QColor('black'))
         self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
+
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
         # Remove default paint from selection
@@ -47,6 +50,33 @@ class Ellipse(QGraphicsEllipseItem):
         self.height = self.rect().height()
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
+
+class Text(QGraphicsTextItem):
+    def __init__(self):
+        super().__init__()
+        self.inherited_widget = None
+        self.gizmo = None
+        self.x = self.pos().x()
+        self.y = self.pos().y()
+        self.width = self.boundingRect().width()
+        self.height = self.boundingRect().height()
+        self.grabKeyboard()
+        self.grabMouse()
+        # self.update()
+        self.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextEditable | Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        # self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable | QGraphicsItem.ItemIsMovable)
+
+    def paint(self, painter, option, widget):
+        is_selected = option.state & QStyle.State_Selected
+        # Remove default paint from selection
+        self.x = self.pos().x()
+        self.y = self.pos().y()
+        self.width = self.boundingRect().width()
+        self.height = self.boundingRect().height()
+        option.state &= ~QStyle.State_Selected
+        super().paint(painter, option, widget)
+
 
 class Pixmap(QGraphicsPixmapItem):
     def __init__(self):
@@ -61,6 +91,7 @@ class Pixmap(QGraphicsPixmapItem):
         self.file_name = None
 
         self.setFlags(QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemIsFocusable)
+
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
         # Remove default paint from selection
@@ -70,6 +101,7 @@ class Pixmap(QGraphicsPixmapItem):
         self.height = self.pixmap().height()
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
+
     def setRect(self, rect):
         if rect.width() != self.width or rect.height != self.height:
             self.setPixmap(QPixmap(self.file_name).scaled(int(rect.width()), int(rect.height()), Qt.IgnoreAspectRatio))
@@ -78,11 +110,14 @@ class Pixmap(QGraphicsPixmapItem):
         # else:
         self.setPos(rect.x(), rect.y())
         self.update()
+
     def rect(self):
         return QRectF(self.x, self.y, self.width, self.height)
 
+
 class Entity():
-    def __init__(self, scene, type: str = ..., size: tuple = ..., pos: tuple = ..., color: str = 'black', pen_color: str = 'black', filename: str = ...):
+    def __init__(self, scene, type: str = ..., size: tuple = ..., pos: tuple = ..., color: str = 'black',
+                 pen_color: str = 'black', filename: str = ...):
         super().__init__()
         self.scene = scene
         self.type = type
@@ -90,6 +125,7 @@ class Entity():
         self.pos = pos
         self.pen_color = pen_color
         self.color = color
+
     def draw(self):
         match self.type:
             case "rectangle":
@@ -110,3 +146,7 @@ class Entity():
                 self.item.setPixmap(QPixmap('cat-image.jpg'))
                 self.scene.addItem(self.item)
                 self.item.setRect(QRectF(self.pos[0], self.pos[1], self.size[0], self.size[1]))
+            case "text":
+                self.item = Text()
+                self.item.setHtml('<h1>Text</h1>')
+                self.scene.addItem(self.item)
