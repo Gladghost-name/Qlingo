@@ -103,11 +103,10 @@ class Pixmap(QGraphicsPixmapItem):
         super().paint(painter, option, widget)
 
     def setRect(self, rect):
-        if rect.width() != self.width or rect.height != self.height:
-            self.setPixmap(QPixmap(self.file_name).scaled(int(rect.width()), int(rect.height()), Qt.IgnoreAspectRatio))
+        if rect.width() != self.width:
+            self.setPixmap(QPixmap(self.file_name).scaled(int(rect.width()), int(rect.height()), Qt.KeepAspectRatio))
             self.width = self.pixmap().width()
             self.height = self.pixmap().height()
-        # else:
         self.setPos(rect.x(), rect.y())
         self.update()
 
@@ -117,7 +116,7 @@ class Pixmap(QGraphicsPixmapItem):
 
 class Entity():
     def __init__(self, scene, type: str = ..., size: tuple = ..., pos: tuple = ..., color: str = 'black',
-                 pen_color: str = 'black', filename: str = ...):
+                 pen_color: str = 'black', filename: str = 'obj-edit.png'):
         super().__init__()
         self.scene = scene
         self.type = type
@@ -125,6 +124,7 @@ class Entity():
         self.pos = pos
         self.pen_color = pen_color
         self.color = color
+        self.filename = filename
 
     def draw(self):
         match self.type:
@@ -142,8 +142,8 @@ class Entity():
                 self.scene.addItem(self.item)
             case "pixmap":
                 self.item = Pixmap()
-                self.item.file_name = 'cat-image.jpg'
-                self.item.setPixmap(QPixmap('cat-image.jpg'))
+                self.item.file_name = self.filename
+                self.item.setPixmap(QPixmap(self.filename))
                 self.scene.addItem(self.item)
                 self.item.setRect(QRectF(self.pos[0], self.pos[1], self.size[0], self.size[1]))
             case "text":
