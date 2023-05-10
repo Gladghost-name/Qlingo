@@ -10,7 +10,7 @@ from PyQt5.Qt import *
 from components import *
 
 class RectGizmo(QFrame):
-    def __init__(self, gizmos_list, items, paste_objects):
+    def __init__(self, scene, gizmos_list, items, paste_objects):
         super().__init__()
         self.setStyleSheet("""background-color: transparent;""")
         self.item = None
@@ -21,6 +21,7 @@ class RectGizmo(QFrame):
         self.object_move_speed = 10
 
         self.proportional = False
+        self.scene = scene
 
         self.dragging = 'None'
         self.list = gizmos_list
@@ -41,6 +42,11 @@ class RectGizmo(QFrame):
         self.dup_annual_x = 0
         self.dup_annual_y = 0
 
+        # self.coord_label = QLabel("It's not working!")
+        # scene.addWidget(self.coord_label)
+        # self.coord_label.setStyleSheet("""background-color: black; border: 2px; border-radius: 2px; padding: 3px;""")
+        # self.coord_label.hide()
+
         self.shortcut_dup = QShortcut(QKeySequence('ctrl+D'), self)
         self.shortcut_dup.activated.connect(self.duplicate_item)
 
@@ -58,12 +64,20 @@ class RectGizmo(QFrame):
         if type(self.item) != Pixmap:
             self.new_item.setBrush(self.item.brush())
             self.new_item.setPen(self.item.pen())
+        else:
+            self.new_item.setPixmap(QPixmap(self.item.file_name))
+            self.new_item.file_name = self.item.file_name
         self.new_item.setRect(QRectF(self.item.x+self.dup_annual_x, self.item.y+self.dup_annual_y, self.item.width, self.item.height))
         self.item.scene().addItem(self.new_item)
-        self.item.scene().setFocusItem(self.new_item)
+
         if self.item.inherited_widget is None:
             self.dup_annual_x += 20
             self.dup_annual_y += 20
+
+        # self.hide()
+        self.item.scene().setFocusItem(self.new_item)
+        self.item.scene().update()
+        self.update()
     def setItem(self, item):
         self.item = item
         # self.item.setParentItem(self)
@@ -258,9 +272,16 @@ class RectGizmo(QFrame):
                     # for item in self.all_items:
                     self.rec = QRectF(item.rect())
                     self.new_rect = self.rec.translated(-(item.gizmo.pos_x - a0.x()), -(item.gizmo.pos_y - a0.y()))
+
                     item.setRect(self.new_rect)
+                    # self.coord_label.move(int(a0.x()), int(a0.y()))
+
                     self.pressed = True
                     item.gizmo.update()
+
+                    # self.coord_label.show()
+                    # self.coord_label.setText(f'x: {item.x} y: {item.y}')
+
                     item.update()
                     item.scene().update()
                 elif self.cur_dragging == 'top':
@@ -303,7 +324,7 @@ class RectGizmo(QFrame):
                 item.setOpacity(1)
                 self.setFixedSize(int(item.rect().size().width() + 15), int(item.rect().size().height() + 15))
                 self.hide()
-                self.new_frame = RectGizmo(item.gizmo.list, item.gizmo.all_items, item.gizmo.objects_to_paste)
+                self.new_frame = RectGizmo(self.scene, item.gizmo.list, item.gizmo.all_items, item.gizmo.objects_to_paste)
                 self.gizmos.append(self.new_frame)
                 self.new_frame.setItem(item)
                 item.scene().addWidget(self.new_frame)
@@ -316,6 +337,7 @@ class RectGizmo(QFrame):
                 self.deleteLater()
                 # item.gizmo.deleteLater()
             self.update()
+            # self.coord_label.hide()
 
     def close_all(self):
         for widget in self.list:
@@ -329,7 +351,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
+            self.new_frame = RectGizmo(self.scene, self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -349,7 +371,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
+            self.new_frame = RectGizmo(self.scene, self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -369,7 +391,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
+            self.new_frame = RectGizmo(self.scene, self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -389,7 +411,7 @@ class RectGizmo(QFrame):
 
             self.hide()
 
-            self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
+            self.new_frame = RectGizmo(self.scene, self.list, self.all_items, self.objects_to_paste)
             self.gizmos.append(self.new_frame)
             self.new_frame.setItem(self.item)
             self.item.scene().addWidget(self.new_frame)
@@ -426,12 +448,12 @@ class RectGizmo(QFrame):
         for gizmo in self.list:
             gizmo.hide()
 
-        self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
+        self.new_frame = RectGizmo(self.scene, self.list, self.all_items, self.objects_to_paste)
         self.list.append(self.new_frame)
         self.new_frame.setItem(item)
         item.scene().addWidget(self.new_frame)
 
-        self.new_frame = RectGizmo(self.list, self.all_items, self.objects_to_paste)
+        self.new_frame = RectGizmo(self.scene, self.list, self.all_items, self.objects_to_paste)
         self.list.append(self.new_frame)
         self.new_frame.setItem(self.item)
         self.item.scene().addWidget(self.new_frame)
@@ -481,7 +503,7 @@ class GraphicsView(QGraphicsView):
 
         self.items_to_paste = []
 
-        self.setStyleSheet("""selection-background-color: #272727; border: 0px;""")
+        self.setStyleSheet("""selection-background-color: #272727; border: 0px; background-color: transparent;""")
 
         self.setRenderHints(QPainter.Antialiasing | QPainter.TextAntialiasing)
 
@@ -501,12 +523,12 @@ class GraphicsView(QGraphicsView):
         self.board.setPen(QPen(Qt.NoPen))
         self.board.setBrush(QColor('white'))
 
-        self.demo_rect = Entity(self.scene(), 'pixmap', (200, 500), (50, 50))
+        self.demo_rect = Entity(self.scene(), 'pixmap', (200, 200), (50, 50), 'black')
         self.demo_rect.draw()
         self.scene().setFocusItem(self.demo_rect.item)
 
 
-        self.demo_rect2 = Entity(self.scene(), 'text', (100, 100), (50, 50), "black")
+        self.demo_rect2 = Entity(self.scene(), 'rectangle', (100, 100), (50, 50), "black")
         self.demo_rect2.draw()
         self.grabKeyboard()
 
@@ -521,7 +543,7 @@ class GraphicsView(QGraphicsView):
             for item in self.scene().selectedItems():
                 if item not in self.selected_item:
                     self.selected_item.append(item)
-                    self.gizmo = RectGizmo(self.gizmos, self.selected_item, self.items_to_paste)
+                    self.gizmo = RectGizmo(self.scene(), self.gizmos, self.selected_item, self.items_to_paste)
                     self.gizmo.setItem(item)
                     self.scene().addWidget(self.gizmo)
                     self.gizmos.append(self.gizmo)
@@ -548,6 +570,8 @@ class MyApp(QApplication):
         # self.undo_stack = QUndoStack()
         # self.commend = QUndoCommand()
         # self.undo_stack.push(self.command)
+        self.shortcut_open_image = QShortcut(QKeySequence('ctrl+i'), self.main)
+        self.shortcut_open_image.activated.connect(self.open_image)
 
         self.body = QFrame()
         self.body_layout = QVBoxLayout()
@@ -576,11 +600,18 @@ class MyApp(QApplication):
         self.scene = QGraphicsScene()
         # self.scene.del
         self.view = GraphicsView(self.scene)
-        self.view.setBackgroundBrush(QColor('#D9D9D9'))
+        #self.view.setBackgroundBrush(QColor('#D9D9D9'))
         # self.view.setStyleSheet("""border: 0px;""")
         self.body_layout.addWidget(self.view)
 
         self.main.setCentralWidget(self.body)
+    def open_image(self):
+        self.file_dialog = QFileDialog()
+        self.file = self.file_dialog.getOpenFileName(self.main, "Open An Image")
+        if self.file[0]:
+            self.entity = Entity(self.scene, 'pixmap', size=(500, 500), pos=(50, 50), filename=self.file[0])
+            self.entity.draw()
+            print(self.file[0])
     def bringfront(self):
         for item in self.scene.selectedItems():
             item.setZValue(1)
