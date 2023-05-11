@@ -32,8 +32,15 @@ class Rectangle(QGraphicsRectItem):
 class Ellipse(QGraphicsEllipseItem):
     def __init__(self):
         super().__init__()
+
         self.inherited_widget = None
+
         self.gizmo = None
+        self.new_gizmo = None
+        self.hidden_check = False
+        self.c_x = 0
+        self.c_y = 0
+
         self.x = self.rect().x()
         self.y = self.rect().y()
         self.width = self.rect().width()
@@ -48,8 +55,11 @@ class Ellipse(QGraphicsEllipseItem):
         self.y = self.rect().y()
         self.width = self.rect().width()
         self.height = self.rect().height()
+
         option.state &= ~QStyle.State_Selected
         super().paint(painter, option, widget)
+    def setView(self, view):
+        self.view = view
 
 class Text(QGraphicsTextItem):
     def __init__(self):
@@ -95,6 +105,7 @@ class Pixmap(QGraphicsPixmapItem):
     def paint(self, painter, option, widget):
         is_selected = option.state & QStyle.State_Selected
         # Remove default paint from selection
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
         self.x = self.pos().x()
         self.y = self.pos().y()
         self.width = self.pixmap().width()
@@ -104,7 +115,8 @@ class Pixmap(QGraphicsPixmapItem):
 
     def setRect(self, rect):
         if rect.width() != self.width:
-            self.setPixmap(QPixmap(self.file_name).scaled(int(rect.width()), int(rect.height()), Qt.KeepAspectRatio))
+            # adding and scaling the image with smooth pixel transformation.
+            self.setPixmap(QPixmap(self.file_name).scaled(int(rect.width()), int(rect.height()), Qt.KeepAspectRatio, Qt.SmoothTransformation))
             self.width = self.pixmap().width()
             self.height = self.pixmap().height()
         self.setPos(rect.x(), rect.y())
@@ -150,3 +162,4 @@ class Entity():
                 self.item = Text()
                 self.item.setHtml('<h1>Text</h1>')
                 self.scene.addItem(self.item)
+        self.item.setCursor(Qt.SizeAllCursor)
