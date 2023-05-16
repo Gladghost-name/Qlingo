@@ -13,6 +13,7 @@ class RectGizmo(QFrame):
         self.all_items = items
 
         self.objects_to_paste = paste_objects
+        self.start_rotation = False
 
         self.object_move_speed = 10
 
@@ -45,11 +46,6 @@ class RectGizmo(QFrame):
         self.dup_annual_x = 0
         self.dup_annual_y = 0
 
-        # self.coord_label = QLabel("It's not working!")
-        # scene.addWidget(self.coord_label)
-        # self.coord_label.setStyleSheet("""background-color: black; border: 2px; border-radius: 2px; padding: 3px;""")
-        # self.coord_label.hide()
-
         self.shortcut_dup = QShortcut(QKeySequence('ctrl+D'), self)
         self.shortcut_dup.activated.connect(self.duplicate_item)
 
@@ -81,6 +77,7 @@ class RectGizmo(QFrame):
             self.dup_annual_y += 20
 
         # self.hide()
+        # self.item.scene().clearSelection()
         self.item.scene().setFocusItem(self.new_item)
         self.item.scene().update()
         self.update()
@@ -216,12 +213,19 @@ class RectGizmo(QFrame):
                 self.move_x = item.gizmo.pos_x
                 self.move_y = item.gizmo.pos_y
                 if self.cur_dragging == 'bottomRight':
-                    if self.proportional:
-                        item.setRect(QRectF(item.rect().x(), item.rect().y(), self.move_y, self.move_y))
+                    if self.start_rotation == True:
+                        item.setTransformOriginPoint(item.x+item.width, item.y+item.height)
+                        item.setRotation(a0.y()-item.width)
+                        item.update()
+                        self.update()
+                        item.scene().update()
                     else:
-                        item.setRect(QRectF(item.rect().x(), item.rect().y(), self.move_x, self.move_y))
-                    self.update()
-                    item.scene().update()
+                        if self.proportional:
+                            item.setRect(QRectF(item.rect().x(), item.rect().y(), self.move_y, self.move_y))
+                        else:
+                            item.setRect(QRectF(item.rect().x(), item.rect().y(), self.move_x, self.move_y))
+                        self.update()
+                        item.scene().update()
                 elif self.cur_dragging == 'right':
                     item.setRect(
                         QRectF(item.rect().x(), item.rect().y(), self.move_x, item.rect().height()))
@@ -237,41 +241,62 @@ class RectGizmo(QFrame):
                     item.scene().update()
                 elif self.cur_dragging == 'bottomLeft':
                     # self.item.rect().setLeft(a0.x())
-                    self.rec = QRectF(item.rect())
-                    if self.proportional:
-                        self.new_rect = self.rec.adjusted((item.gizmo.pos_y - a0.y()), 0, 0,
-                                                          -(item.gizmo.pos_y - a0.y()))
+                    if self.start_rotation == True:
+                        item.setTransformOriginPoint(item.x, item.y+item.height)
+                        item.setRotation(a0.y()-item.width)
+                        item.update()
+                        self.update()
+                        item.scene().update()
                     else:
-                        self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), 0, 0,
-                                                          -(item.gizmo.pos_y - a0.y()))
-                    item.setRect(self.new_rect)
-                    item.update()
-                    self.update()
-                    item.scene().update()
+                        self.rec = QRectF(item.rect())
+                        if self.proportional:
+                            self.new_rect = self.rec.adjusted((item.gizmo.pos_y - a0.y()), 0, 0,
+                                                              -(item.gizmo.pos_y - a0.y()))
+                        else:
+                            self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), 0, 0,
+                                                              -(item.gizmo.pos_y - a0.y()))
+                        item.setRect(self.new_rect)
+                        item.update()
+                        self.update()
+                        item.scene().update()
                 elif self.cur_dragging == 'topLeft':
-                    self.rec = QRectF(item.rect())
-                    if self.proportional:
-                        self.new_rect = self.rec.adjusted(-(item.gizmo.pos_y - a0.y()), -(item.gizmo.pos_y - a0.y()), 0,
-                                                          0)
+                    if self.start_rotation == True:
+                        item.setTransformOriginPoint(item.x, item.y)
+                        item.setRotation(a0.y())
+                        item.update()
+                        self.update()
+                        item.scene().update()
                     else:
-                        self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), -(item.gizmo.pos_y - a0.y()), 0,
-                                                          0)
-                    item.setRect(self.new_rect)
-                    item.update()
-                    self.update()
-                    item.scene().update()
+                        self.rec = QRectF(item.rect())
+                        if self.proportional:
+                            self.new_rect = self.rec.adjusted(-(item.gizmo.pos_y - a0.y()), -(item.gizmo.pos_y - a0.y()), 0,
+                                                              0)
+                        else:
+                            self.new_rect = self.rec.adjusted(-(item.gizmo.pos_x - a0.x()), -(item.gizmo.pos_y - a0.y()), 0,
+                                                              0)
+                        item.setRect(self.new_rect)
+                        item.update()
+                        self.update()
+                        item.scene().update()
                 elif self.cur_dragging == 'topRight':
-                    self.rec = QRectF(item.rect())
-                    if self.proportional:
-                        self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), (item.gizmo.pos_y - a0.y()),
-                                                          0)
+                    if self.start_rotation == True:
+                        item.setTransformOriginPoint(item.x+item.width, item.y)
+                        item.setRotation(a0.y())
+                        item.update()
+                        self.update()
+                        item.scene().update()
                     else:
-                        self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), -(item.gizmo.pos_x - a0.x()),
-                                                          0)
-                    item.setRect(self.new_rect)
-                    item.update()
-                    self.update()
-                    item.scene().update()
+                        self.rec = QRectF(item.rect())
+                        if self.proportional:
+                            self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), (item.gizmo.pos_y - a0.y()),
+                                                              0)
+                        else:
+                            self.new_rect = self.rec.adjusted(0, -(item.gizmo.pos_y - a0.y()), -(item.gizmo.pos_x - a0.x()),
+                                                              0)
+                        item.setRect(self.new_rect)
+                        item.update()
+                        self.update()
+                        item.scene().update()
                 elif self.cur_dragging == 'bottom':
                     item.setRect(
                         QRectF(item.rect().x(), item.rect().y(), item.rect().width(), item.gizmo.move_y))
@@ -315,14 +340,14 @@ class RectGizmo(QFrame):
                 if self.dragging != 'center':
                     self.item.setOpacity(.5)
                 # else:
-                    # if type(self.scene.itemAt(a0.x(), a0.y(), self.item.view.transform())) == QGraphicsProxyWidget:
-                    #     self.item.hidden_check = True
-                    #     self.item.c_x = a0.x()
-                    #     self.item.c_y = a0.y()
-                    #     self.pressed = True
-                    #     self.item.new_gizmo = self
-                    #     self.hide()
-                    #     self.item.update()
+                # if type(self.scene.itemAt(a0.x(), a0.y(), self.item.view.transform())) == QGraphicsProxyWidget:
+                #     self.item.hidden_check = True
+                #     self.item.c_x = a0.x()
+                #     self.item.c_y = a0.y()
+                #     self.pressed = True
+                #     self.item.new_gizmo = self
+                #     self.hide()
+                #     self.item.update()
                 for i in self.all_items:
                     i.gizmo.pressed = True
                     if i is not self.item:
@@ -511,3 +536,5 @@ class RectGizmo(QFrame):
                 self.handle_multi_movement(a0, item)
         else:
             self.handle_movement(a0)
+        if a0.key() == Qt.Key_Control:
+            self.start_rotation = True

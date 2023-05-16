@@ -40,7 +40,8 @@ class Ellipse(QGraphicsEllipseItem):
         self.hidden_check = False
         self.c_x = 0
         self.c_y = 0
-
+        # self.setRotation()
+        # self.setTransformOriginPoint()
         self.x = self.rect().x()
         self.y = self.rect().y()
         self.width = self.rect().width()

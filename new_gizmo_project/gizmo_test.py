@@ -48,8 +48,11 @@ class GraphicsView(QGraphicsView):
         self.board.setPen(QPen(Qt.NoPen))
         self.board.setBrush(QColor('white'))
 
-        self.demo_rect2 = Entity(self.scene(), 'ellipse', (100, 100), (50, 50), "black")
+        self.demo_rect2 = Entity(self.scene(), 'rectangle', (100, 100), (50, 50), "black")
         self.demo_rect2.draw()
+
+        self.demo_rect1 = Entity(self.scene(), 'ellipse', (100, 100), (100, 100), "black")
+        self.demo_rect1.draw()
         self.grabKeyboard()
 
 
