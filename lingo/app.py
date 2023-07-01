@@ -1,14 +1,9 @@
-import os
-
-from PyQt5.QtWidgets import *
-from PyQt5.Qt import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5 import QtGui, QtCore
-from qlingo.runner import *
 import sys
-from qlingo.wid.widgets import *
-from qlingo.handlers.prop_handler import *
+# from wid.widgets import *
+# from handlers.prop_handler import *
+import os
+from Qlingo.lingo.runner import *
+
 
 
 class AppFrame(QFrame):
@@ -114,8 +109,3 @@ class qquApp(QApplication):
 
     def load_app(self):
         self.window.load()
-
-# to run the application!
-# app = qquApp('app.qqu')
-# app.reloadable(True)
-# app.run()

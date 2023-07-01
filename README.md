@@ -77,13 +77,13 @@ To generate a pyqt5 designed app from figma is made easy by using the qlingo ter
 ### Importing using pip.
 
 ```bash
-pip install qlingo-cmd
+pip install lingo-cmd
 ```
 
 ### Generating a package from url 📦
 
 ```shell
-qlingo -generate {FILETOKEN} {FILEURL}
+lingo -generate {FILETOKEN} {FILEURL}
 ```
 
 This will generate an app package that contains your styles, A main runnable python script and a qqu script for reloading the application based on your ``figma design``, just remember to replace the ``{FILETTOKEN}`` and ``{FILEURL}`` with your token and your file-key or file-url respectively.

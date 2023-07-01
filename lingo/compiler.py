@@ -1,7 +1,7 @@
 # Use pprint to print data with style!.
-from qlingo.parser import *
-from qlingo.wid.widgets import *
-from qlingo.langvals.vals import *
+from Qlingo.lingo.parser import *
+from Qlingo.lingo.wid.widgets import *
+from Qlingo.lingo.langvals.vals import *
 
 
 class Compiler():

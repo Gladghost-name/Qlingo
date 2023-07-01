@@ -1,4 +1,4 @@
-from qlingo.app import *
+from Qlingo.lingo.app import *
 
 class MyApp(qquApp):
     def __init__(self):

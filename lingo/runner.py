@@ -1,8 +1,8 @@
-from qlingo.parser import *
+from Qlingo.lingo.parser import *
 import sys
-from qlingo.wid.widgets import *
-from qlingo.compiler import *
-from qlingo.handlers.prop_handler import *
+from Qlingo.lingo.wid.widgets import *
+from Qlingo.lingo.compiler import *
+from Qlingo.lingo.handlers.prop_handler import *
 
 class Runner():
     def __init__(self):
@@ -43,4 +43,4 @@ class Runner():
 
 # To start a simple build!.
 # runner = Runner()
-# runner.run('qlingo/app.qqu')
+# runner.run('lingo/app.qqu')

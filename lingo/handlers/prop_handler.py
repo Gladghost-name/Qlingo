@@ -1,9 +1,9 @@
-from qlingo.langvals.vals import *
+from Qlingo.lingo.langvals.vals import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.Qt import *
 from PyQt5.QtGui import *
-from qlingo.wid.widgets import *
+from Qlingo.lingo.wid.widgets import *
 
 
 class PropHandler:
