@@ -2,10 +2,15 @@ Window:
     title: "Python 3.11"
     // Creating a BoxLayout
     BoxLayout:
-        background_color: "grey"
+        background_color: "black"
         width: 850
         height: 600
         Frame:
-            Label:
-                text_align: "center"
-                text: "A Simple Cooking Application!."
+            Text:
+                color: "white"
+                font_weight: 10
+                font_size: 12
+                text: "Nothing to show here!"
+            Button:
+                text: "Cooking App!"
+                background_color: 'orange'

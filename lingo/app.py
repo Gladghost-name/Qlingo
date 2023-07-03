@@ -58,6 +58,9 @@ class Window(QMainWindow):
         self.modifiedOn = os.path.getmtime(self.file)
 
     def run(self):
+        self.setWindowTitle("pyQt App")
+        self.setIconSize(QSize(12, 12))
+        self.setWindowIcon(QIcon(r'C:\Users\adara\OneDrive\Documents\WIndows Assistant\myWIdgets\Qlingo\lingo\Qt_logo.png'))
         if self.content != []:
             # clear all the viewing widgets.
             for widget in self.content:
